@@ -1,0 +1,129 @@
+/* Body */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #4f7df3, #5ed0f3);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Container */
+.container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 700px;
+}
+
+/* Título */
+.container h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Labels */
+.form-group label {
+    /*display: block;*/
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #444;
+}
+
+/* Inputs */
+.form-group input {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group.cep input {
+    margin: 10px;
+    width: 150px;
+}
+
+.form-group.numero input{
+    width: 80px;
+    margin-left: 10px;
+}
+
+.form-group.cpf input {
+    margin: 10px;
+    width: 190px;
+}
+.form-group.telefone input {
+    margin: 10px;
+    width: 190px;
+}
+.form-group.email input {
+    margin: 10px;
+    width: 400px;
+}
+/* Efeito no input */
+.form-group input:focus {
+    border-color: #4f7df3;
+    box-shadow: 0 0 5px rgba(79, 125, 243, 0.4);
+}
+
+/* Botões */
+form button {
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Botão submit */
+form button[type="submit"] {
+    background-color: #4f7df3;
+    color: white;
+    width: 48%;
+}
+
+/* Botão cancelar */
+form button[type="button"] {
+    background-color: #ccc;
+    color: #333;
+    width: 48%;
+}
+
+/* Efeito Hover */
+form button[type="submit"]:hover {
+    background-color: #3d67d6;
+}
+
+form button[type="button"]:hover {
+    background-color: #aaa;
+}
+
+/* Disposição dos botões */
+.form-buttons {
+    display: flex;
+    gap: 4%;
+}
+
+.form-buttons button {
+    width: 48%;
+}
+
+.error {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 4px;
+}

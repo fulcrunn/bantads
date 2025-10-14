@@ -1,0 +1,116 @@
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h4 class="card-title">Transferência</h4>
+
+      <form (ngSubmit)="realizarTransferencia()" #form="ngForm">
+        <div class="mb-3">
+          <label for="contaDestino" class="form-label">Conta Destino</label>
+          <input type="text" id="contaDestino" class="form-control"
+                 [(ngModel)]="contaDestino" name="contaDestino" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="valor" class="form-label">Valor</label>
+          <input type="number" id="valor" class="form-control"
+                 [(ngModel)]="valor" name="valor" required min="1">
+        </div>
+
+        <button class="btn btn-primary w-100" type="submit">Transferir</button>
+      </form>
+
+      <div *ngIf="mensagem" class="alert mt-3"
+           [ngClass]="{'alert-success': sucesso, 'alert-danger': !sucesso}">
+        {{ mensagem }}
+      </div>
+    </div>
+  </div>
+</div>
+
+import { Component } from '@angular/core';
+import { ClienteService } from '../../../services/cliente-service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-transferencia',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './transferencia.html',
+  styleUrl: './transferencia.css'
+})
+export class TransferenciaComponent {
+  contaDestino: string = '';
+  valor: number = 0;
+  mensagem: string = '';
+  sucesso: boolean = false;
+
+  constructor(private clienteService: ClienteService) {}
+
+  realizarTransferencia() {
+    const resultado = this.clienteService.transferir(this.contaDestino, this.valor);
+    this.mensagem = resultado;
+    this.sucesso = !resultado.includes("não") && !resultado.includes("insuficiente") && !resultado.includes("inválido");
+    
+    // resetar valor se deu certo
+    if (this.sucesso) {
+      this.contaDestino = '';
+      this.valor = 0;
+    }
+  }
+}
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Transferencia } from './transferencia';
+
+describe('Transferencia', () => {
+  let component: Transferencia;
+  let fixture: ComponentFixture<Transferencia>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Transferencia]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(Transferencia);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+import { Component } from '@angular/core';
+import { ClienteService } from '../../../services/cliente-service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-transferencia',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './transferencia.html',
+  styleUrl: './transferencia.css'
+})
+export class TransferenciaComponent {
+  contaDestino: string = '';
+  valor: number = 0;
+  mensagem: string = '';
+  sucesso: boolean = false;
+
+  constructor(private clienteService: ClienteService) {}
+
+  realizarTransferencia() {
+    const resultado = this.clienteService.transferir(this.contaDestino, this.valor);
+    this.mensagem = resultado;
+    this.sucesso = !resultado.includes("não") && !resultado.includes("insuficiente") && !resultado.includes("inválido");
+    
+    // resetar valor se deu certo
+    if (this.sucesso) {
+      this.contaDestino = '';
+      this.valor = 0;
+    }
+  }
+}

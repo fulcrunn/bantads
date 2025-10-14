@@ -1,0 +1,33 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <!-- Atalhos -->
+    <div class="col-md-6">
+      <div class="list-group shadow-sm">
+        <a routerLink="/deposito" class="list-group-item list-group-item-action">
+          Depositar
+        </a>
+        <a routerLink="/saque" class="list-group-item list-group-item-action">
+          Sacar
+        </a>
+        <a routerLink="/transferencia" class="list-group-item list-group-item-action">
+          Transferir
+        </a>
+        <a routerLink="/extrato" class="list-group-item list-group-item-action">
+          Consultar extrato
+        </a>
+      </div>
+    </div>
+
+    <!-- Saldo -->
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Saldo Atual</h5>
+          <p class="h4" [class.text-success]="saldo >= 0" [class.text-danger]="saldo < 0">
+            {{ saldo | currency:'BRL':'symbol':'1.2-2' }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
