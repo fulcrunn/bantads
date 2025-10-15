@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import br.ufpr.bantads.ms_cliente.repository.ClienteRepository;
 import br.ufpr.bantads.ms_cliente.service.ClienteService;
 import br.ufpr.bantads.ms_cliente.model.*;
 
