@@ -10,29 +10,40 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.ufpr.bantads.ms_auth.model.UserAuth;
 import br.ufpr.bantads.ms_auth.service.AuthService;
+import br.ufpr.bantads.ms_auth.service.JwtService;
+
 
 @RestController
-@RequestMapping("/api/auth/")
+@RequestMapping("/auth")
 
 public class AuthController {
     
-    @Autowired // injecção de dependência
-    private AuthService authService;
+    private final AuthService authService;
+    private final JwtService jwtService;
 
-    @PostMapping
+    @Autowired 
+    public AuthController(AuthService authService, JwtService jwtService) { 
+        this.authService = authService;
+        this.jwtService = jwtService; 
+    }
+    
+    @PostMapping("/login")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> loginAuth(@RequestBody LoginRequestDTO loginRequestDTO) {
         UserAuth usuarioAutenticado = authService.authenticate(loginRequestDTO.getLogin(), loginRequestDTO.getSenha());
         if (usuarioAutenticado != null) {
-            
+            String token = jwtService.generateToken(usuarioAutenticado.getLogin(), usuarioAutenticado.getTipo().name());
             Map<String, Object> response = new HashMap<>();
-            response.put("access_token", "PLACEHOLDER_JWT_TOKEN"); 
+            response.put("access_token", token); 
             response.put("token_type", "bearer");
             response.put("tipo", usuarioAutenticado.getTipo().name()); // Pega o nome do enum
-            response.put("usuario", usuarioAutenticado); // Inclui os dados do usuário
+            
+            Map<String, String> userInfo = new HashMap<>();
+            userInfo.put("id", usuarioAutenticado.getId().toString());
+            userInfo.put("login", usuarioAutenticado.getLogin());
+            response.put("user", userInfo);
 
             // Retorna 200 OK com o corpo da resposta
             return new ResponseEntity<>(response, HttpStatus.OK);

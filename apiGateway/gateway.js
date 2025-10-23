@@ -9,7 +9,7 @@ const PORT = 3000;
 app.use(morgan('dev'));
 app.use(cors());
 
-// 🔹 Rota para o microserviço de clientes
+// Rota para o microserviço de clientes
 app.use('/api/clientes', createProxyMiddleware({
   target: 'http://localhost:8080/api/clientes',
   changeOrigin: true,
@@ -17,6 +17,13 @@ app.use('/api/clientes', createProxyMiddleware({
     '^/api': '', // 
   },
   //pathRewrite: { '^/api/clientes': '' },
+}));
+
+// Rota para o microserviço de autenticação
+app.use('/auth', createProxyMiddleware({
+  target: 'http://localhost:8081',
+  changeOrigin: true,
+  logLevel: 'debug' // <--- Adicione esta linha
 }));
 
 // 🔹 Rota principal (teste)
