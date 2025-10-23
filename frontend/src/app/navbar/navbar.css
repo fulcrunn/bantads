@@ -1,0 +1,96 @@
+/* --- Container Principal da Navbar --- */
+body {
+  padding-top: 70px; /* altura aproximada da navbar */
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    /* Alinha itens: marca à esquerda, resto à direita */
+    align-items: center;
+    background-color: white;
+    padding: 0 2rem;
+    /* Espaçamento interno (vertical | horizontal) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Sombra suave para dar profundidade */
+    height: 60px;
+    /* Altura fixa */
+    width: 100%;
+    position: fixed;
+    /* Fixa a navbar no topo da página */
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    /* Garante que a navbar fique acima de outros conteúdos */
+}
+
+/* --- Lado Direito da Navbar (Links e Ações) --- */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    /* Espaço entre a lista de links e o botão de sair */
+}
+
+/* --- Marca/Logo (BANTADS) --- */
+.navbar-brand a {
+    text-decoration: none;
+    color: #4f7df3;
+    /* Cor azul principal do seu design */
+    font-size: 1.8rem;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* --- Lista de Links de Navegação --- */
+.navbar-links {
+    list-style: none;
+    /* Remove os pontos da lista */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    /* Coloca os itens da lista lado a lado */
+    gap: 1.5rem;
+    /* Espaçamento entre os links */
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: #333;
+    /* Cor de texto escura */
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+/* Efeito hover nos links */
+.navbar-links a:hover {
+    color: #4f7df3;
+    /* Muda para a cor azul ao passar o mouse */
+}
+
+/* --- Botão de Sair --- */
+.navbar-actions button {
+    /* Reutilizando o estilo do seu botão de login */
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #4f7df3;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Efeito hover no botão */
+.navbar-actions button:hover {
+    background-color: #3d67d6;
+    /* Tom de azul mais escuro do seu design */
+}

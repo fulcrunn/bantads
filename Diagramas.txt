@@ -1,0 +1,481 @@
+Diagramas de casos de uso - Simplificado
+
+@startuml
+left to right direction
+actor Cliente
+actor Gerente
+actor Administrador
+
+rectangle "BANTADS - Internet Banking" {
+    ' Casos de uso do Cliente
+    Cliente -- (R1: Autocadastro)
+    Cliente -- (R2: Login/Logout)
+    Cliente -- (R3: Visualizar Tela Inicial)
+    Cliente -- (R4: Alterar Perfil)
+    Cliente -- (R5: Depositar)
+    Cliente -- (R6: Sacar)
+    Cliente -- (R7: Transferir)
+    Cliente -- (R8: Consultar Extrato)
+
+    ' Casos de uso do Gerente
+    Gerente -- (R9: Visualizar Tela Inicial)
+    Gerente -- (R10: Aprovar Cliente)
+    Gerente -- (R11: Rejeitar Cliente)
+    Gerente -- (R12: Consultar Todos os Clientes)
+    Gerente -- (R13: Consultar Cliente por CPF)
+    Gerente -- (R14: Consultar Top 3 Clientes)
+
+    ' Casos de uso do Administrador
+    Administrador -- (R15: Visualizar Tela Inicial)
+    Administrador -- (R16: Gerar Relatório de Clientes)
+    Administrador -- (R17: Inserir Gerente)
+    Administrador -- (R18: Remover Gerente)
+    Administrador -- (R19: Listar Gerentes)
+    Administrador -- (R20: Alterar Gerente)
+}
+
+@enduml
+
+################
+      END
+################
+
+Diagrama de casos de uso completo
+@startuml
+left to right direction
+
+actor Cliente
+actor Gerente
+actor Administrador
+
+rectangle "BANTADS - Internet Banking" {
+    
+    ' ---------------- Perfil Cliente ----------------
+    package "Perfil Cliente" {
+        (R1: Autocadastro)
+        (R2: Login/Logout)
+        (R3: Tela Inicial Cliente)
+        (R4: Alterar Perfil)
+        (R5: Depositar)
+        (R6: Saque)
+        (R7: Transferência)
+        (R8: Consultar Extrato)
+    }
+
+    Cliente -- (R1: Autocadastro)
+    Cliente -- (R2: Login/Logout)
+    Cliente -- (R3: Tela Inicial Cliente)
+    Cliente -- (R4: Alterar Perfil)
+    Cliente -- (R5: Depositar)
+    Cliente -- (R6: Saque)
+    Cliente -- (R7: Transferência)
+    Cliente -- (R8: Consultar Extrato)
+
+    ' ---------------- Perfil Gerente ----------------
+    package "Perfil Gerente" {
+        (R9: Tela Inicial Gerente)
+        (R10: Aprovar Cliente)
+        (R11: Rejeitar Cliente)
+        (R12: Consultar Todos os Clientes)
+        (R13: Consultar Cliente)
+        (R14: Consultar Top 3 Clientes)
+    }
+
+    Gerente -- (R9: Tela Inicial Gerente)
+    (R9: Tela Inicial Gerente) --> (R10: Aprovar Cliente) : <<include>>
+    (R9: Tela Inicial Gerente) --> (R11: Rejeitar Cliente) : <<include>>
+    Gerente -- (R12: Consultar Todos os Clientes)
+    Gerente -- (R13: Consultar Cliente)
+    Gerente -- (R14: Consultar Top 3 Clientes)
+
+    ' ---------------- Perfil Administrador ----------------
+    package "Perfil Administrador" {
+        (R15: Tela Inicial Administrador)
+        (R16: Relatório de Clientes)
+        (R17: Inserir Gerente)
+        (R18: Remover Gerente)
+        (R19: Listar Gerentes)
+        (R20: Alterar Gerente)
+    }
+
+    Administrador -- (R15: Tela Inicial Administrador)
+    Administrador -- (R16: Relatório de Clientes)
+    Administrador -- (R17: Inserir Gerente)
+    Administrador -- (R18: Remover Gerente)
+    Administrador -- (R19: Listar Gerentes)
+    Administrador -- (R20: Alterar Gerente)
+
+    ' ---------------- Relações gerais ----------------
+    (R2: Login/Logout) --> (R3: Tela Inicial Cliente) : <<include>>
+    (R3: Tela Inicial Cliente) --> (R5: Depositar) : <<extend>>
+    (R3: Tela Inicial Cliente) --> (R6: Saque) : <<extend>>
+    (R3: Tela Inicial Cliente) --> (R7: Transferência) : <<extend>>
+    (R3: Tela Inicial Cliente) --> (R8: Consultar Extrato) : <<extend>>
+}
+
+@enduml
+
+################
+      END
+################
+
+Diagrama de Classes
+
+@startuml
+' ----------------- Classes principais -----------------
+class Cliente {
+    - nome : String
+    - email : String
+    - cpf : String
+    - telefone : String
+    - salario : Double
+    --
+    + alterarPerfil()
+    + consultarExtrato()
+    + depositar()
+    + sacar()
+    + transferir()
+}
+
+class Endereco {
+    - tipo : String
+    - logradouro : String
+    - numero : String
+    - complemento : String
+    - cep : String
+    - cidade : String
+    - estado : String
+}
+
+class Conta {
+    - numeroConta : String
+    - dataCriacao : Date
+    - saldo : Double
+    - limite : Double
+    --
+    + calcularLimite()
+    + atualizarSaldo()
+}
+
+class Movimentacao {
+    - dataHora : DateTime
+    - tipo : String  ' (depósito, saque, transferência)
+    - valor : Double
+}
+
+class Gerente {
+    - nome : String
+    - email : String
+    - cpf : String
+    - telefone : String
+    --
+    + aprovarCliente()
+    + rejeitarCliente()
+    + consultarClientes()
+}
+
+class Administrador {
+    - nome : String
+    - email : String
+    - cpf : String
+    - telefone : String
+    --
+    + inserirGerente()
+    + removerGerente()
+    + listarGerentes()
+    + alterarGerente()
+    + gerarRelatorio()
+}
+
+class UsuarioAuth {
+    - login : String
+    - senha : String
+    - tipo : String  ' (CLIENTE, GERENTE, ADMIN)
+    --
+    + autenticar()
+}
+
+' ----------------- Relações -----------------
+Cliente "1" -- "1" Conta
+Cliente "1" -- "1" Endereco
+Conta "1" -- "*" Movimentacao
+Gerente "1" -- "*" Cliente : gerencia >
+Administrador "1" -- "*" Gerente : administra >
+Cliente "1" -- "1" UsuarioAuth
+Gerente "1" -- "1" UsuarioAuth
+Administrador "1" -- "1" UsuarioAuth
+
+@enduml
+
+################
+      END
+################
+
+Diagrama de Sequência (R1: Autocadastro)
+
+@startuml
+actor Cliente
+
+Cliente -> Frontend : Preenche dados e envia Autocadastro
+Frontend -> APIGateway : POST /autocadastro
+APIGateway -> MSCliente : criarCliente()
+
+MSCliente -> MSGerente : escolherGerenteMenosClientes()
+MSGerente --> MSCliente : retornaGerente
+
+MSCliente -> MSAutenticacao : criarUsuarioAuth()
+MSAutenticacao --> MSCliente : sucesso/erro
+
+MSCliente -> MSConta : prepararConta()
+MSConta --> MSCliente : contaCriada (pendente)
+
+MSCliente --> APIGateway : sucesso (solicitação enviada)
+APIGateway --> Frontend : Exibe mensagem "Solicitação enviada"
+Frontend --> Cliente : Confirmação visual
+
+alt Erro interno
+    MSCliente -> EmailService : enviarEmailFalha()
+    EmailService --> Cliente : Notificação de erro
+end
+@enduml
+
+################
+      END
+################
+
+Diagrama de sequência do caso de uso R10 – Aprovar Cliente
+
+startuml
+actor Gerente
+
+Gerente -> Frontend : Seleciona cliente e clica "Aprovar"
+Frontend -> APIGateway**: POST /gerente/aprovarCliente
+APIGateway -> MSGerente : aprovarCliente(clienteId)
+
+MSGerente -> MSConta : criarConta(clienteId, salario)
+MSConta --> MSGerente : contaCriada(numeroConta, limite)
+
+MSGerente -> MSAutenticacao : ativarUsuario(clienteId, senhaAleatoria)
+MSAutenticacao --> MSGerente : sucesso
+
+MSGerente -> EmailService : enviarSenha(cliente.email, senhaAleatoria)
+EmailService --> Cliente : "Sua conta foi aprovada. Senha: XXXX"
+
+MSGerente --> APIGateway : sucesso (cliente aprovado)
+APIGateway --> Frontend : Atualiza tela (status: aprovado)
+Frontend --> Gerente : Confirmação visual
+
+alt Erro interno
+    MSGerente -> EmailService : enviarEmailFalha()
+    EmailService --> Gerente : Notificação de erro
+end
+@enduml
+
+################
+      END
+################
+
+Diagrama de sequência - Rejeitar Cliente
+
+@startuml
+actor Gerente
+
+Gerente -> Frontend : Seleciona cliente e clica "Rejeitar"
+Frontend -> APIGateway : POST /gerente/rejeitarCliente
+APIGateway -> MSGerente : rejeitarCliente(clienteId, motivo)
+
+MSGerente -> MSCliente : atualizarStatus(clienteId, "REJEITADO")
+MSCliente --> MSGerente : status atualizado
+
+MSGerente -> EmailService : enviarRejeicao(cliente.email, motivo)
+EmailService --> Cliente : "Sua solicitação foi rejeitada. Motivo: XXXX"
+
+MSGerente --> APIGateway : sucesso (cliente rejeitado)
+APIGateway --> Frontend : Atualiza tela (status: rejeitado)
+Frontend --> Gerente : Confirmação visual
+
+@enduml
+
+################
+      END
+################
+
+Diagrama de sequência: Transferência
+
+@startuml
+actor Cliente
+
+Cliente -> Frontend : Solicita transferência (valor, contaDestino)
+Frontend -> APIGateway : POST /transferencia
+APIGateway -> MSConta : iniciarTransferencia(origem, destino, valor)
+
+' --- Validação de saldo e limite ---
+MSConta -> MSCliente : consultarDadosCliente(origem)
+MSCliente --> MSConta : dadosCliente(salario, limite)
+MSConta -> MSConta : validarSaldo(origem, valor, limite)
+
+alt Saldo insuficiente
+    MSConta --> APIGateway : erro("Saldo insuficiente")
+    APIGateway --> Frontend : mensagem de erro
+    Frontend --> Cliente : Exibe erro
+else Saldo suficiente
+    ' --- Execução da SAGA ---
+    MSConta -> SAGAOrquestrador : iniciarSAGA(transferencia)
+    SAGAOrquestrador -> MSConta : debitar(origem, valor)
+    MSConta --> SAGAOrquestrador : sucesso débito
+
+    SAGAOrquestrador -> MSConta : creditar(destino, valor)
+    MSConta --> SAGAOrquestrador : sucesso crédito
+
+    SAGAOrquestrador --> MSConta : confirmarTransacao
+    MSConta --> APIGateway : sucesso (transferência concluída)
+
+    ' --- Registro da Movimentação ---
+    MSConta -> MSConta : registrarMovimentacao(origem, destino, valor)
+    MSConta --> MSConta : atualização CQRS (banco leitura)
+    
+    APIGateway --> Frontend : Transferência confirmada
+    Frontend --> Cliente : Exibe comprovante
+end
+@enduml
+
+################
+      END
+################
+
+Diagrama sequência - Consulta Extrato
+
+@startuml
+actor Cliente
+
+Cliente -> Frontend : Solicita extrato (dataInicio, dataFim)
+Frontend -> APIGateway : GET /extrato?inicio=xx&fim=yy
+APIGateway -> MSConta : consultarExtrato(clienteId, dataInicio, dataFim)
+
+' --- Consulta via CQRS ---
+MSConta -> BancoLeitura : buscarMovimentacoes(clienteId, periodo)
+BancoLeitura --> MSConta : listaMovimentacoes
+
+' --- Processamento ---
+MSConta -> MSConta : calcularSaldoDiario()
+MSConta -> MSConta : aplicarCores(entrada=azul, saida=vermelho)
+
+' --- Resposta ---
+MSConta --> APIGateway : extratoFormatado
+APIGateway --> Frontend : JSON extrato
+Frontend --> Cliente : Exibe extrato na tela
+@enduml
+
+################
+      END
+################
+
+Diagrama sequência - Insere Gerente
+
+@startuml
+actor Administrador
+
+Administrador -> Frontend : Inserir novo Gerente
+Frontend -> APIGateway : POST /gerente
+APIGateway -> MSGerente : criarGerente(dados)
+
+' --- Regra de redistribuição ---
+MSGerente -> MSGerente : consultarGerenteComMaisContas()
+MSGerente --> MSGerente : retornaGerenteAlvo
+
+' --- Criação do Gerente ---
+MSGerente -> MSAutenticacao : criarUsuarioAuth(login, senha, "GERENTE")
+MSAutenticacao --> MSGerente : sucesso
+
+' --- Redistribuição de Conta ---
+MSGerente -> SAGAOrquestrador : iniciarSAGA(insercaoGerente)
+SAGAOrquestrador -> MSConta : transferirConta(gerenteAlvo, novoGerente)
+MSConta --> SAGAOrquestrador : sucesso
+
+SAGAOrquestrador --> MSGerente : confirmarOperacao
+MSGerente --> APIGateway : sucesso
+APIGateway --> Frontend : Confirma inserção
+Frontend --> Administrador : Novo Gerente criado
+@enduml
+
+################
+      END
+################
+
+Diagrama sequência - Remove Gerente
+
+@startuml
+actor Administrador
+
+Administrador -> Frontend : Solicita remover Gerente
+Frontend -> APIGateway : DELETE /gerente/{id}
+APIGateway -> MSGerente : removerGerente(gerenteId)
+
+' --- Regra de redistribuição ---
+MSGerente -> MSGerente : consultarGerenteComMenosContas()
+MSGerente --> MSGerente : retornaGerenteDestino
+
+alt Existe outro gerente
+    ' --- SAGA de redistribuição ---
+    MSGerente -> SAGAOrquestrador : iniciarSAGA(remocaoGerente)
+    SAGAOrquestrador -> MSConta : transferirContas(gerenteRemovido, gerenteDestino)
+    MSConta --> SAGAOrquestrador : sucesso
+
+    SAGAOrquestrador -> MSGerente : excluirGerente(gerenteId)
+    MSGerente -> MSAutenticacao : removerUsuarioAuth(gerenteId)
+    MSAutenticacao --> MSGerente : sucesso
+
+    MSGerente --> APIGateway : sucesso
+    APIGateway --> Frontend : Confirma remoção
+    Frontend --> Administrador : Gerente removido
+else Último gerente
+    MSGerente --> APIGateway : erro("Não é possível remover o último gerente")
+    APIGateway --> Frontend : mensagem de erro
+    Frontend --> Administrador : Exibe erro
+end
+@enduml
+
+################
+      END
+################
+
+Diagrama sequência - Login
+
+@startuml
+actor Usuario as ClienteGerenteAdmin
+
+ClienteGerenteAdmin -> Frontend : Digita email e senha
+Frontend -> APIGateway : POST /login {email, senha}
+APIGateway -> MSAutenticacao : autenticar(email, senha)
+
+alt Credenciais válidas
+    MSAutenticacao -> MongoDB : buscarUsuario(email)
+    MongoDB --> MSAutenticacao : dadosUsuario + senhaHash
+    MSAutenticacao -> MSAutenticacao : validarSenha()
+    MSAutenticacao -> JWTService : gerarTokenJWT(usuario)
+    JWTService --> MSAutenticacao : tokenJWT
+
+    MSAutenticacao --> APIGateway : {token, tipo, usuario}
+    APIGateway --> Frontend : JSON de resposta
+    Frontend --> ClienteGerenteAdmin : Exibe sucesso (usuário logado)
+else Credenciais inválidas
+    MSAutenticacao --> APIGateway : erro("Usuário ou senha inválidos")
+    APIGateway --> Frontend : mensagem de erro
+    Frontend --> ClienteGerenteAdmin : Exibe erro de login
+end
+@enduml
+
+################
+      END
+################
+
+Diagrama de Sequência - Logout
+
+@startuml
+actor Usuario as ClienteGerenteAdmin
+
+ClienteGerenteAdmin -> Frontend : Clica em "Logout"
+Frontend -> Frontend : descartarTokenJWT()
+Frontend --> ClienteGerenteAdmin : Retorna à tela inicial (usuário deslogado)
+@enduml
+

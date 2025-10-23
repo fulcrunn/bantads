@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">BANTADS</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        
+        <!-- Links exclusivos para cliente -->
+        <ng-container *ngIf="authService.role === 'cliente'">
+          <a class="nav-link" routerLink="/cliente/tela-inicial">Início</a>
+          <a class="nav-link" routerLink="/perfil">Meu Perfil</a>
+          
+        </ng-container>
+
+        <!-- Links exclusivos para gerente -->
+        <ng-container *ngIf="authService.role === 'gerente'">
+          <a class="nav-link" routerLink="gerente/tela-inicial">Início</a>
+          <li class="nav-item"><a class="nav-link" routerLink="/gerente/visualizar-clientes">Consultar Clientes</a></li>
+          <li class="nav-item"><a class="nav-link" routerLink="/gerente/top3">Top 3 Clientes</a></li>
+        </ng-container>
+
+        <!-- Links exclusivos para admin -->
+        <ng-container *ngIf="authService.role === 'admin'">
+          <a class="nav-link" routerLink="/administrador/tela-inicial-adm">Início</a>
+          <li class="nav-item"><a class="nav-link" routerLink="/administrador/listagem-gerente">Listar Gerentes</a></li>
+          
+        </ng-container>
+
+      </ul>
+
+      <!-- Botão de logout -->
+      <div class="d-flex ms-3" *ngIf="authService.role">
+        <button class="btn btn-outline-danger btn-sm" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </div>
+</nav>
