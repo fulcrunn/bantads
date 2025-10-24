@@ -11,21 +11,21 @@
       <ul class="navbar-nav ms-auto">
         
         <!-- Links exclusivos para cliente -->
-        <ng-container *ngIf="authService.role === 'cliente'">
+        <ng-container *ngIf="authService.loginResponse.tipo === 'cliente'">
           <a class="nav-link" routerLink="/cliente/tela-inicial">Início</a>
           <a class="nav-link" routerLink="/perfil">Meu Perfil</a>
           
         </ng-container>
 
         <!-- Links exclusivos para gerente -->
-        <ng-container *ngIf="authService.role === 'gerente'">
+        <ng-container *ngIf="authService.loginResponse.tipo === 'gerente'">
           <a class="nav-link" routerLink="gerente/tela-inicial">Início</a>
           <li class="nav-item"><a class="nav-link" routerLink="/gerente/visualizar-clientes">Consultar Clientes</a></li>
           <li class="nav-item"><a class="nav-link" routerLink="/gerente/top3">Top 3 Clientes</a></li>
         </ng-container>
 
         <!-- Links exclusivos para admin -->
-        <ng-container *ngIf="authService.role === 'admin'">
+        <ng-container *ngIf="authService.loginResponse.tipo === 'admin'">
           <a class="nav-link" routerLink="/administrador/tela-inicial-adm">Início</a>
           <li class="nav-item"><a class="nav-link" routerLink="/administrador/listagem-gerente">Listar Gerentes</a></li>
           
@@ -34,7 +34,7 @@
       </ul>
 
       <!-- Botão de logout -->
-      <div class="d-flex ms-3" *ngIf="authService.role">
+      <div class="d-flex ms-3" *ngIf="authService.loginResponse.tipo">
         <button class="btn btn-outline-danger btn-sm" (click)="logout()">Sair</button>
       </div>
     </div>

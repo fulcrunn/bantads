@@ -33,8 +33,7 @@ public class InitialDataLoader implements CommandLineRunner {
         criarUtilizadorSeNaoExistir("gerente1@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE);
         criarUtilizadorSeNaoExistir("gerente2@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE);
         criarUtilizadorSeNaoExistir("gerente3@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE);
-        // Clientes Iniciais (Opcional - talvez não necessário aqui, pois vêm do autocadastro)
-        // criarUtilizadorSeNaoExistir("...", "...", UserAuth.TipoCliente.USUARIO);
+        
     }
     private void criarUtilizadorSeNaoExistir(String login, String senha, UserAuth.TipoCliente tipo) {
         try {

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsuarioService } from './services/usuario-service';
-import { LoginService } from './services/login-service';
+
 
 
 @Component({
@@ -18,7 +18,7 @@ import { LoginService } from './services/login-service';
 export class App {
   protected title = 'banco';
 
-  constructor(public authService: AuthService, public router: Router,private loginService: LoginService) {
-    this.loginService.inicializarUsuariosParaTeste();
+  constructor(public authService: AuthService, public router: Router) {
+    
   }  
 }
