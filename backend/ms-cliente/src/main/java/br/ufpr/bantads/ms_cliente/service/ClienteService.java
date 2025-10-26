@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import br.ufpr.bantads.ms_cliente.model.Cliente;
+import br.ufpr.bantads.ms_cliente.model.Cliente.StatusCliente;
 import br.ufpr.bantads.ms_cliente.repository.ClienteRepository;
 import java.util.Optional;
 
@@ -32,7 +33,11 @@ public class ClienteService {
 
     public List<Cliente> getAllClientes() {
         return clienteRepository.findAll();
-          }    
+          }
+          
+     public List<Cliente> getClientesPorStatus(Cliente.StatusCliente status) {
+        return clienteRepository.findByStatus(status);
+          }       
 
     public Optional<Cliente> getClienteById(Long id) {
         return clienteRepository.findById(id);

@@ -29,6 +29,11 @@ public class ClienteController {
         return clienteService.getAllClientes();
     }
 
+    @GetMapping("/pendentes")
+    public List<Cliente> getClientesPendentes() {
+        return clienteService.getClientesPorStatus(Cliente.StatusCliente.PENDENTE);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createCliente(@RequestBody Cliente cliente) {

@@ -26,6 +26,13 @@ app.use('/auth', createProxyMiddleware({
   logLevel: 'debug',   
 }));
 
+// Rota para o microserviço de gerentes
+app.use('/gerentes', createProxyMiddleware({ // Escuta por pedidos em /gerentes/...
+  target: 'http://localhost:8082/gerentes',       // Encaminha para ms-gerente (porta 8082)
+  changeOrigin: true,
+  // pathRewrite não é necessário aqui, pois o ms-gerente também espera /gerentes/...
+}));
+
 // 🔹 Rota principal (teste)
 app.get('/', (req, res) => {
   res.send('Gateway ativo e roteando requisições!');
