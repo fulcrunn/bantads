@@ -15,7 +15,6 @@
           <th scope="col">CPF</th>
           <th scope="col">Nome</th>
           <th scope="col">Salário</th>
-          <th scope="col">Limite</th>
           <th scope="col" class="text-center" style="width: 220px;">Ações</th>
         </tr>
       </thead>
@@ -24,10 +23,9 @@
           <td>{{ cliente.cpf }}</td>
           <td>{{ cliente.nome }}</td>
           <td>{{ cliente.salario | currency:'BRL':'symbol' }}</td>
-          <td>{{ cliente.limite | currency:'BRL':'symbol' }}</td>
           <td class="text-center">
-            <button class="btn btn-success btn-sm me-2" (click)="aprovar(cliente)">Aprovar</button>
-            <button class="btn btn-outline-danger btn-sm" (click)="abrirModalRecusar(cliente)">Recusar</button>
+            <button class="btn btn-success btn-sm me-2" >Aprovar</button>
+            <button class="btn btn-outline-danger btn-sm">Recusar</button>
           </td>
         </tr>
       </tbody>

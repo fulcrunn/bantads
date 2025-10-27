@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Cliente } from '../shared/models/cliente.model';
 import { ClienteService } from './cliente-service';
+import { HttpClient } from '@angular/common/http';
+import { ClientePendente } from '../shared/models/cliente-pendente';
+import { Observable } from 'rxjs';
 
 const LS_CHAVE = "clientes"
 const LS_CHAVE_TEMP = "clientesPendentes"
@@ -9,14 +12,15 @@ const LS_CHAVE_TEMP = "clientesPendentes"
   providedIn: 'root'
 })
 export class GerenteService {
+  private readonly API_URL = 'http://localhost:3000/gerentes'; // URL base
   clientesPendentes: any[] = [];
   clientesAprovados: Cliente[] = [];
   clientesRecusados: Cliente[] = [];
   mensagem: string = '';
-
-  constructor() {
-      }
-
+  
+  private readonly API_URL_PENDENTES = 'http://localhost:3000/gerentes/clientes-pendentes';
+  constructor(private http: HttpClient) { }
+  
   calcularLimite(salario: number): number {
   let limite = 0.0;
   console.log(salario + " - " + typeof salario);
@@ -29,6 +33,11 @@ export class GerenteService {
     return 0.0;
   }
 }
+
+  listarClientesPendentes(): Observable<ClientePendente[]>{
+    return this.http.get<ClientePendente[]>(`${this.API_URL}/clientes-pendentes`);
+  }
+
   carregarClientesPendentes(): any{
     const listaClientePendenteAux = JSON.parse(localStorage.getItem(LS_CHAVE_TEMP) || '[]');
     for(let cliente of listaClientePendenteAux){

@@ -12,6 +12,7 @@ export class ClienteService {
   
   // endereço da api de microserviço
   private readonly API_URL = 'http://localhost:3000/api/clientes';
+  private readonly API_URL_ClientesPendentes = 'http://localhost:3000/api/clientesPendentes';
   cliente: Cliente | null = null;
   constructor(private http: HttpClient) { }
 

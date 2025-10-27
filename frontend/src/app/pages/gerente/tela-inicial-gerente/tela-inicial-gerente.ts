@@ -5,6 +5,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Cliente } from '../../../shared/models/cliente.model';
 import { ClienteService } from '../../../services/cliente-service';
 import { GerenteService } from '../../../services/gerente-service';
+import { ClientePendente } from '../../../shared/models/cliente-pendente';
 
 const LS_CHAVE = "clientes"
 const LS_CHAVE_TEMP = "clientesPendentes"
@@ -18,7 +19,7 @@ const LS_CHAVE_TEMP = "clientesPendentes"
 })
 
 export class TelaInicialGerente {
-  clientesPendentes: any[] = [];
+  clientesPendentes: ClientePendente[] = [];
   clientesAprovados: Cliente[] = [];
   clientesRecusados: Cliente[] = [];
   mensagem: string = '';
@@ -29,12 +30,25 @@ export class TelaInicialGerente {
 
   ngOnInit() {
   this.carregarPedidos();
+  this.listarPendentes();
   this.clientesAprovados = this.gerenteService.carregarClientesAprovados();
   }
 
+  listarPendentes() {
+  this.gerenteService.listarClientesPendentes()
+    .subscribe({
+      next: (listaRecebida) => { this.clientesPendentes = listaRecebida;
+      },
+      error: (erro) => {
+        console.error('Erro ao buscar clientes pendentes:', erro);
+        this.mensagem = 'Erro ao carregar clientes pendentes.';
+      }
+    });
+}
+
   carregarPedidos() {
     this.clientesPendentes = this.gerenteService.carregarClientesPendentes();
-  }
+  }  
 
   aprovar(cliente: Cliente) {
   this.gerenteService.aprovar(cliente);
