@@ -1,0 +1,6 @@
+/* You can add global styles to this file, and also import other style files */
+/* No arquivo styles.css principal do projeto */
+body {
+    /* Adiciona um espaço no topo do corpo da página */
+    padding-top: 60px; /* Este valor deve ser igual à altura da sua navbar */
+}
