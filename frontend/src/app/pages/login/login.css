@@ -1,0 +1,96 @@
+/* body */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: linear-gradient(135deg, #4f7df3, #5ed0f3);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+.container {
+    margin-top: 200px;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+}
+
+/* Título */
+.container h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Forms */
+.form-group {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+/* Labels */
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #444;
+}
+
+/* Inputs */
+.form-group input {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+/* Efeito no input */
+.form-group input:focus {
+    border-color: #4f7df3;
+    box-shadow: 0 0 5px rgba(79, 125, 243, 0.4);
+}
+
+/* Botão */
+button {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #4f7df3;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Efeito hover */
+button:hover {
+    background-color: #3d67d6;
+}
+
+/* Mensagem de erro */
+p[ng-reflect-ng-if] {
+    color: red;
+    font-size: 14px;
+    margin-top: 0.5rem;
+}
+
+/* Link de cadastro */
+p a {
+    color: #4f7df3;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+p a:hover {
+    text-decoration: underline;
+}

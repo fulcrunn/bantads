@@ -1,0 +1,30 @@
+<div class="container mt-4">
+  <h2>Remoção de Gerentes</h2>
+
+  <table class="table table-bordered table-striped mt-3">
+    <thead class="table-dark">
+      <tr>
+        <th>CPF</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Telefone</th>
+        <th>Qtd Contas</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of gerentes">
+        <td>{{ g.gerente.cpf }}</td>
+        <td>{{ g.gerente.nome }}</td>
+        <td>{{ g.gerente.email }}</td>
+        <td>{{ g.gerente.telefone }}</td>
+        <td>{{ g.contas.length }}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" (click)="removerGerente(g.gerente.cpf)">
+            Remover
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
