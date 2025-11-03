@@ -2,7 +2,11 @@ package br.ufpr.bantads.ms_conta.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
+
+import br.ufpr.bantads.ms_conta.DTO.ComandoCriarContaDTO;
 import br.ufpr.bantads.ms_conta.model.Conta;
 import br.ufpr.bantads.ms_conta.repository.ContaRepository;
 
@@ -57,5 +61,11 @@ public class contaService {
 
         //Salva no banco e retorna o objeto salvo
         return contaRepository.save(novaConta);
+    }
+
+    @RabbitListener(queues = "${rabbitmq.aprovacao.queue.conta}")
+    public void onCriarConta(ComandoCriarContaDTO comando) {
+        System.out.println("Recebido comando para criar conta para o cliente ID: " + comando.getIdCliente());
+        criarConta(comando.getIdCliente(), comando.getSalario(), comando.getIdGerente());
     }
 }
