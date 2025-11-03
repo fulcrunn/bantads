@@ -57,6 +57,5 @@ public class contaService {
 
         //Salva no banco e retorna o objeto salvo
         return contaRepository.save(novaConta);
-
     }
 }

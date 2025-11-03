@@ -63,5 +63,9 @@ public class GerenteService {
         return gerenteRepository.save(gerente);
         // Aqui você pode adicionar a lógica para salvar o gerente no banco de dados
     }
+
+    public void findGerenteComMenosContas(){
+        // Lógica para encontrar o gerente com menos contas atribuídas
+    }
     
 }
