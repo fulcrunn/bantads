@@ -2,10 +2,8 @@ package br.ufpr.bantads.ms_cliente.repository;
 
 import br.ufpr.bantads.ms_cliente.model.Cliente;
 import br.ufpr.bantads.ms_cliente.model.Cliente.StatusCliente;
-
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

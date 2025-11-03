@@ -1,7 +1,5 @@
 package br.ufpr.bantads.ms_auth.config;
 
-import java.security.NoSuchAlgorithmException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -29,11 +27,7 @@ public class InitialDataLoader implements CommandLineRunner {
     private void criarUtilizadoresIniciais() {
         // Administrador
         criarUtilizadorSeNaoExistir("admin@bantads.com.br", "admin", UserAuth.TipoCliente.ADMINISTRADOR);
-        // Gerentes
-        criarUtilizadorSeNaoExistir("gerente1@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE);
-        criarUtilizadorSeNaoExistir("gerente2@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE);
-        criarUtilizadorSeNaoExistir("gerente3@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE);
-        
+                
     }
     private void criarUtilizadorSeNaoExistir(String login, String senha, UserAuth.TipoCliente tipo) {
         try {

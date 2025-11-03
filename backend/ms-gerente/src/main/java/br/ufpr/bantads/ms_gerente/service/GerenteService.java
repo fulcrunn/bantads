@@ -2,7 +2,8 @@ package br.ufpr.bantads.ms_gerente.service;
 
 import java.util.Arrays;
 import java.util.List;
-import br.ufpr.bantads.ms_gerente.config.RabbitMQConfig;
+import br.ufpr.bantads.ms_gerente.model.Gerente;
+import br.ufpr.bantads.ms_gerente.repository.GerenteRepository;
 import org.springframework.beans.factory.annotation.Value;
 import br.ufpr.bantads.ms_gerente.DTO.ClienteRejeitadoEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,10 +19,12 @@ public class GerenteService {
     private String exchangeName;
     private final RabbitTemplate rabbitTemplate;
     private final RestTemplate restTemplate;
+    private final GerenteRepository gerenteRepository;
 
-    public GerenteService(RestTemplate restTemplate, RabbitTemplate rabbitTemplate) {
+    public GerenteService(RestTemplate restTemplate, RabbitTemplate rabbitTemplate, GerenteRepository gerenteRepository) {
         this.restTemplate = restTemplate;
         this.rabbitTemplate = rabbitTemplate;
+        this.gerenteRepository = gerenteRepository;
     }
 
     public void rejeitarCliente(Long clienteId, String motivo) {
@@ -48,6 +51,17 @@ public class GerenteService {
     public void aprovarCliente(Long clienteId){ // verificar este método
         String url = "http://localhost:8080/api/clientes/" + clienteId + "/aprovar";
         restTemplate.patchForObject(url, null, Void.class);
+    }
+
+    public Gerente criarNovoGerente(Gerente gerente) {
+        if(gerenteRepository.findByCpf(gerente.getCpf()).isPresent()) {
+            throw new IllegalArgumentException("CPF já cadastrado");
+        }else if(gerenteRepository.findByEmail(gerente.getEmail()).isPresent()){
+            throw new IllegalArgumentException("Email já cadastrado");
+        }
+        System.out.println("Criando novo gerente: " + gerente.getNome() );
+        return gerenteRepository.save(gerente);
+        // Aqui você pode adicionar a lógica para salvar o gerente no banco de dados
     }
     
 }
