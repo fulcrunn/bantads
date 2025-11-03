@@ -1,0 +1,62 @@
+package br.ufpr.bantads.ms_conta.service;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import org.springframework.stereotype.Service;
+import br.ufpr.bantads.ms_conta.model.Conta;
+import br.ufpr.bantads.ms_conta.repository.ContaRepository;
+
+@Service
+public class contaService {
+
+    private final ContaRepository contaRepository;
+
+    public contaService(ContaRepository contaRepository) {
+        this.contaRepository = contaRepository;
+    }
+    
+    private String gerarConta(){
+        String numConta = "";
+        for (int i = 0; i < 4; i++) {
+            int digito = (int) (Math.random() * 10);
+            numConta += digito;
+        }
+        return numConta;
+    }
+
+    public String gerarNumConta() {
+        String numConta = gerarConta();
+        while(contaRepository.findByNumConta(numConta).isPresent()){
+            numConta = gerarConta();
+        }
+        return numConta;        
+    }
+
+    public BigDecimal calcLimita(BigDecimal salario){
+        if(salario.compareTo(new BigDecimal("2000")) >= 0){
+            BigDecimal limite = salario.multiply(new BigDecimal("0.5"));
+            return limite;
+        }else{ return new BigDecimal("0.00");}
+       
+    }
+
+    public Conta criarConta(Long idCliente, BigDecimal salario, Long idGerente){
+        String numConta = gerarNumConta();
+        BigDecimal limite = calcLimita(salario);
+        BigDecimal saldoInicial = new BigDecimal("0.00");
+        Date dataAbertura = new Date();
+
+        // cria a conta
+        Conta novaConta = new Conta();
+        novaConta.setIdCliente(idCliente);
+        novaConta.setIdGerente(idGerente);
+        novaConta.setNumConta(numConta);
+        novaConta.setLimite(limite);
+        novaConta.setSaldo(saldoInicial);
+        novaConta.setAbertura(dataAbertura);
+
+        //Salva no banco e retorna o objeto salvo
+        return contaRepository.save(novaConta);
+
+    }
+}
