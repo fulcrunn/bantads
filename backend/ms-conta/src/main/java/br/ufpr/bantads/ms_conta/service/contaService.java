@@ -2,11 +2,13 @@ package br.ufpr.bantads.ms_conta.service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import br.ufpr.bantads.ms_conta.DTO.ComandoCriarContaDTO;
+import br.ufpr.bantads.ms_conta.DTO.GerentePorContaDTO;
 import br.ufpr.bantads.ms_conta.model.Conta;
 import br.ufpr.bantads.ms_conta.repository.ContaRepository;
 
@@ -66,6 +68,17 @@ public class contaService {
     @RabbitListener(queues = "${rabbitmq.aprovacao.queue.conta}")
     public void onCriarConta(ComandoCriarContaDTO comando) {
         System.out.println("Recebido comando para criar conta para o cliente ID: " + comando.getIdCliente());
-        criarConta(comando.getIdCliente(), comando.getSalario(), comando.getIdGerente());
+        try {            
+            criarConta(comando.getIdCliente(), comando.getSalario(), comando.getIdGerente());            
+            System.out.println("Conta criada com sucesso para o cliente ID: " + comando.getIdCliente());
+            
+        } catch (Exception e) {
+            System.err.println("Erro ao processar comando de criação de conta para o cliente ID " + comando.getIdCliente() + ": " + e.getMessage());
+            
+        }
+    }
+
+    public List<GerentePorContaDTO> getGerentePorConta() {
+        return contaRepository.countContasByGerente();
     }
 }
