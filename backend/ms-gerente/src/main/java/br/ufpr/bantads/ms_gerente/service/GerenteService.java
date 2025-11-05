@@ -2,6 +2,8 @@ package br.ufpr.bantads.ms_gerente.service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+
 import br.ufpr.bantads.ms_gerente.model.Gerente;
 import br.ufpr.bantads.ms_gerente.repository.GerenteRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import br.ufpr.bantads.ms_gerente.DTO.ClientePendenteDTO;
+import br.ufpr.bantads.ms_gerente.DTO.GerentePorContaDTO;
+
 
 
 @Service
@@ -20,6 +24,7 @@ public class GerenteService {
     private final RabbitTemplate rabbitTemplate;
     private final RestTemplate restTemplate;
     private final GerenteRepository gerenteRepository;
+    
 
     public GerenteService(RestTemplate restTemplate, RabbitTemplate rabbitTemplate, GerenteRepository gerenteRepository) {
         this.restTemplate = restTemplate;
@@ -64,8 +69,31 @@ public class GerenteService {
         // Aqui você pode adicionar a lógica para salvar o gerente no banco de dados
     }
 
-    public void findGerenteComMenosContas(){
-        // Lógica para encontrar o gerente com menos contas atribuídas
+    public Optional<Long> findGerenteComMenosContas(){
+        //IGNORANDO REQUISITO DE VERIFICAR O SALDO DO GERENTE PARA DESEMPATE, PEGAREI O COM MENOS CONTAS QUE APARECER PRIMEIRO
+        String url = "http://localhost:8084/contas/contagem-por-gerente";
+        // Lógica para encontrar o gerente com menos contas
+        GerentePorContaDTO[] gerenteContasArray;
+        try{
+            gerenteContasArray = restTemplate.getForObject(url, GerentePorContaDTO[].class);
+        } catch (Exception e){
+            System.out.println("Erro ao chamar MS-Conta: " + e.getMessage());
+            return Optional.empty();
+        }
+        // fim da lógica de menos contas        
+        List<GerentePorContaDTO> gerenteContasList = (gerenteContasArray!=null) ? Arrays.asList(gerenteContasArray): List.of(); // condicional
+        // forma do gerenteContas [{"idGerente": 1, "quantidadeContas": 5}, ...]
+        Optional<GerentePorContaDTO> gerenteComMenosContas = gerenteContasList.stream()
+            .min((g1, g2) -> Long.compare(g1.getQuantidadeContas(), g2.getQuantidadeContas())); // encontra o gerente com menos contas
+        Optional<Long> idGerente = gerenteComMenosContas.map(dto -> dto.getIdGerente());    
+
+        if(idGerente.isEmpty()){
+            System.out.println("Nenhum gerente encontrado com contas foi encontrado. (Há ao menos um gerente cadastrado!)");
+            Optional<Gerente> primeiroGerente = gerenteRepository.findAll().stream().findFirst();
+            idGerente = primeiroGerente.map(gerente -> gerente.getId());
+        } 
+
+        return idGerente;
     }
     
 }

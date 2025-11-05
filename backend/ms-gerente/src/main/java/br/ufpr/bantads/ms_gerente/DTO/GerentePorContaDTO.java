@@ -1,4 +1,4 @@
-package br.ufpr.bantads.ms_conta.DTO;
+package br.ufpr.bantads.ms_gerente.DTO;
 
 import lombok.Data;
 
