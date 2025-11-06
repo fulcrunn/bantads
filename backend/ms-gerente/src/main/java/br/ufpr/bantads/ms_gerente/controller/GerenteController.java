@@ -2,6 +2,8 @@ package br.ufpr.bantads.ms_gerente.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,5 +51,11 @@ public class GerenteController {
         gerenteService.aprovarCliente(id);
         // Retorna 200 OK (ou 202 Accepted, já que é assíncrono)
         return ResponseEntity.ok().build(); 
+    }
+
+     @GetMapping("/gerente-menos-contas")
+    public Optional<Long> getGerenteMenosContas() {
+       
+        return gerenteService.findGerenteComMenosContas();
     }
 }

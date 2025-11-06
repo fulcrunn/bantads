@@ -3,7 +3,6 @@ package br.ufpr.bantads.ms_gerente.service;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import br.ufpr.bantads.ms_gerente.model.Gerente;
 import br.ufpr.bantads.ms_gerente.repository.GerenteRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -88,7 +87,7 @@ public class GerenteService {
         Optional<Long> idGerente = gerenteComMenosContas.map(dto -> dto.getIdGerente());    
 
         if(idGerente.isEmpty()){
-            System.out.println("Nenhum gerente encontrado com contas foi encontrado. (Há ao menos um gerente cadastrado!)");
+            System.out.println("Nenhum gerente com contas foi encontrado. (Há ao menos um gerente cadastrado!)");
             Optional<Gerente> primeiroGerente = gerenteRepository.findAll().stream().findFirst();
             idGerente = primeiroGerente.map(gerente -> gerente.getId());
         } 

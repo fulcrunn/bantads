@@ -5,12 +5,7 @@ import java.util.List;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import br.ufpr.bantads.ms_cliente.DTO.ClienteRejeitadoEvent;
 import br.ufpr.bantads.ms_cliente.model.Cliente;
 import br.ufpr.bantads.ms_cliente.model.Cliente.StatusCliente;
@@ -50,6 +45,7 @@ public class ClienteService {
         }else if(clienteRepository.findByEmail(cliente.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
         }
+        
         return clienteRepository.save(cliente);
     }
 
