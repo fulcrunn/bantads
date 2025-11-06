@@ -16,8 +16,17 @@ import java.util.Optional;
 public class ClienteService {
     @Value("${rabbitmq.cliente.rejeitado.queue.status}")
     private String queueName;
+    
     private final RabbitTemplate rabbitTemplate;
     private final ClienteRepository clienteRepository;
+    @Value("${rabbitmq.autocadastro.exchange}")
+    private String autocadastroExchange;    
+    @Value("${rabbitmq.autocadastro.routingkey}")
+    private String autocadastroRoutingKey;
+    @Value("${rabbitmq.cliente.pendente.exchange}")
+    private String clientePendenteExchange;
+    @Value("${rabbitmq.cliente.pendente.routingkey}")   
+    private String clientePendenteRoutingKey;
 
     public ClienteService(ClienteRepository clienteRepository,RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
@@ -38,15 +47,23 @@ public class ClienteService {
         }
     }
 
-    public Cliente criarCliente(Cliente cliente) {
+    // Método para criar um novo cliente iniciando a SAGA de autocadastro
+    public void criarCliente(Cliente cliente) {
         if(clienteRepository.findByCpf(cliente.getCpf()).isPresent()) {
             throw new IllegalArgumentException("CPF já cadastrado");
             
         }else if(clienteRepository.findByEmail(cliente.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email já cadastrado");
         }
-        
-        return clienteRepository.save(cliente);
+        System.out.println("Enviando comando para SAGA (Autocadastro) para o cliente: " + cliente.getCpf());
+        rabbitTemplate.convertAndSend(autocadastroExchange, autocadastroRoutingKey, cliente);        
+    }
+
+    @RabbitListener(queues ="${rabbitmq.cliente.pendente.queue}")
+    public void cadastrarClientePendente(Cliente cliente) {
+        System.out.println("Cadastrando cliente pendente ID: " + cliente.getId() + " CPF: " + cliente.getCpf());
+        cliente.setStatus(StatusCliente.PENDENTE);
+        clienteRepository.save(cliente);
     }
 
     public List<Cliente> getAllClientes() {

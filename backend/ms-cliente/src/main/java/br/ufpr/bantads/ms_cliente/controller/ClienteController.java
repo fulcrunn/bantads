@@ -38,9 +38,14 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> createCliente(@RequestBody Cliente cliente) {
         try{
-            Cliente novoCliente = clienteService.criarCliente(cliente);
-            return new ResponseEntity<>(novoCliente, HttpStatus.CREATED);
+            clienteService.criarCliente(cliente);
+            // Cria uma estrutura para a resposta que será usada no frontend
+            Map <String,String> resposta = new HashMap<>();
+            // respota(key:value)
+            resposta.put("mensagem", "Solicitação de autocadastro recebida e em processamento.");
+            return new ResponseEntity<>(resposta, HttpStatus.ACCEPTED);
         } catch (IllegalArgumentException e) {
+            // Cria uma estrutura para a resposta que será usada no frontend
             Map <String,String> erro = new HashMap<>();
             erro.put("mensagem", e.getMessage());
             return new ResponseEntity<>(erro, HttpStatus.BAD_REQUEST);

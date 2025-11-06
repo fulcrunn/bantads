@@ -82,7 +82,6 @@ export class Autocadastro {
         .replace('R$', '')       // remove prefixo, se houver
         .trim();
 
-      this.cliente.status = 'PENDENTE';  
       this.cliente.salario = parseFloat(salarioString);
       this.clienteService.autocadastro(this.cliente).subscribe({
         next: (cliente) => {

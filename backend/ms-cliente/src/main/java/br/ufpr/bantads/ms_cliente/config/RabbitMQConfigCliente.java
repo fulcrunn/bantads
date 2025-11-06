@@ -9,6 +9,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 
 @Configuration // Indica ao Spring que esta classe contém configurações de Beans
 public class RabbitMQConfigCliente {
@@ -23,6 +24,14 @@ public class RabbitMQConfigCliente {
     private String clienteRejeitadoExchange;
     @Value("${rabbitmq.cliente.rejeitado.queue.status}")
     private String clienteRejeitadoQueueStatus;
+    @Value("${rabbitmq.autocadastro.exchange}")
+    private String autocadastroExchange;
+    @Value("${rabbitmq.cliente.pendente.exchange}")
+    private String clientePendenteExchange;
+    @Value("${rabbitmq.cliente.pendente.routingkey}")   
+    private String clientePendenteRoutingKey;
+    @Value("${rabbitmq.cliente.pendente.queue}")
+    private String clientePendenteQueue;
 
     // Declaração do Exchange para cliente rejeitado
     @Bean
@@ -43,5 +52,26 @@ public class RabbitMQConfigCliente {
     public Binding binding(Queue clienteRejeitadoStatusQueue, FanoutExchange clienteRejeitadoExchange) {
         // Liga (bind) a fila (queue) à exchange
         return BindingBuilder.bind(clienteRejeitadoStatusQueue).to(clienteRejeitadoExchange);
+    }
+
+    //o directExchange envia as mensagens para filas específicas com base na routing key
+    @Bean
+    public DirectExchange autocadastroExchange() {
+    return new DirectExchange(autocadastroExchange, true, false);
+    }
+
+    @Bean
+    public DirectExchange clientePendenteExchange() {
+    return new DirectExchange(clientePendenteExchange, true, false);
+    }
+
+    @Bean
+    public Queue clientePendenteQueue() {
+        return new Queue(clientePendenteQueue, true); // true = durável
+    }
+
+    @Bean
+    public Binding bindingClientePendente(Queue clientePendenteQueue, DirectExchange clientePendenteExchange) {
+        return BindingBuilder.bind(clientePendenteQueue).to(clientePendenteExchange).with(clientePendenteRoutingKey);
     }
 }
