@@ -47,8 +47,8 @@ public class GerenteController {
     }
 
     @PatchMapping("/clientes/{id}/aprovar") // Usando PATCH e PathVariable para ID
-    public ResponseEntity<Void> aprovarCliente(@PathVariable Long id) {
-        gerenteService.aprovarCliente(id);
+    public ResponseEntity<Void> aprovarCliente(@PathVariable Long id,@RequestBody ClientePendenteDTO cliente) {
+        gerenteService.aprovarCliente(id, cliente);
         // Retorna 200 OK (ou 202 Accepted, já que é assíncrono)
         return ResponseEntity.ok().build(); 
     }

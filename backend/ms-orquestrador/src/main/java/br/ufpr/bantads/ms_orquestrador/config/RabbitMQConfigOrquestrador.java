@@ -21,6 +21,13 @@ public class RabbitMQConfigOrquestrador {
     @Value("${rabbitmq.autocadastro.queue}")
     private String autocadastroQueue;
 
+    @Value("${rabbitmq.aprovar.queue}")
+    private String clienteAprovadoQueue;
+    @Value("${rabbitmq.aprovar.exchange}")
+    private String clienteAprovadoExchange;
+    @Value("${rabbitmq.aprovar.routingkey}")
+    private String clienteAprovadoRoutingKey;
+
     @Bean // Define um Bean gerenciado pelo Spring
     public MessageConverter jsonMessageConverter() {
         // Retorna a instância do conversor JSON
@@ -42,5 +49,25 @@ public class RabbitMQConfigOrquestrador {
         public Binding binding(Queue autocadastroQueue, DirectExchange autocadastroExchange){
         return BindingBuilder.bind(autocadastroQueue).to(autocadastroExchange).with(autocadastroRoutingKey);
         }
+     
+    // Abaixo estão as @Bean do consumidor   
+    // Declaração do Exchange para cliente aprovado
+    @Bean
+    public DirectExchange clienteAprovadoExchange(){
+        return new DirectExchange(clienteAprovadoExchange, true, true);
+    }
+
+    @Bean
+    public Queue clienteAprovadoQueue() {
+        // O nome vem da sua nova propriedade
+        return new Queue(clienteAprovadoQueue, true); // true = durável
+    }
+
+    // Binding entre a fila e a exchange    
+    @Bean
+    public Binding bindingAprovar(Queue clienteAprovadoQueue, DirectExchange clienteAprovadoExchange) {
+        // Liga (bind) a fila (queue) à exchange
+        return BindingBuilder.bind(clienteAprovadoQueue).to(clienteAprovadoExchange).with(clienteAprovadoRoutingKey);
+    }    
     
 } //end rabbitmqconfigorquestrador

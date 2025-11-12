@@ -41,7 +41,7 @@ export class ClienteService {
     clientes.push(cliente);
     localStorage[LS_CHAVE] = JSON.stringify(clientes);
   }
-
+  // Manda lá pro APIGateway
   autocadastro(cliente: Cliente) {
     return this.http.post<Cliente>(this.API_URL, cliente);
   }

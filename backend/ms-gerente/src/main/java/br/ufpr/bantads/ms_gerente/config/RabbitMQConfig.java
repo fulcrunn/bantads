@@ -3,12 +3,26 @@ package br.ufpr.bantads.ms_gerente.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 
 @Configuration
 public class RabbitMQConfig {
+
+    // O produtor só declara a exchange
+    @Value("${rabbitmq.aprovar.exchange}")
+    private String clienteAprovadoExchange;
+    
+    // Declaração do Exchange para cliente aprovado
+    @Bean
+    public DirectExchange clienteAprovadoExchange(){
+        return new DirectExchange(clienteAprovadoExchange, true, true);
+    }    
 
     @Value("${rabbitmq.cliente.rejeitado.exchange}")
     private String exchangeClienteRejeitado;
@@ -16,7 +30,7 @@ public class RabbitMQConfig {
     @Bean
     public FanoutExchange clienteRejeitadoExchange() {
         // Cria uma FanoutExchange (que envia para todos)
-        return new FanoutExchange(exchangeClienteRejeitado, true, true); // true = durável
+        return new FanoutExchange(exchangeClienteRejeitado, true, true); // true = durávelp
     }
 
     @Bean
@@ -24,8 +38,9 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }    
     
-    
-    
 }
     
-
+//# SAGA - Aprovar cliente
+//rabbitmq.aprovar.queue=QUEUE_APROVACAO_INICIAR
+//rabbitmq.aprovar.exchange=EXCHANGE_APROVAR
+//rabbitmq.aprovar.routingkey=cliente.aprovar.comando

@@ -1,4 +1,4 @@
-package br.ufpr.bantads.ms_gerente.DTO;
+package br.ufpr.bantads.ms_orquestrador.DTO;
 
 import java.math.BigDecimal;
 import jakarta.persistence.EnumType;
@@ -23,5 +23,5 @@ public class ClientePendenteDTO {
         APROVADO,
         REJEITADO
     }
-
+    
 }

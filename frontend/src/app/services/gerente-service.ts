@@ -39,9 +39,13 @@ export class GerenteService {
   }
 
   rejeitarCliente(cliente: ClientePendente, motivo: String): Observable<any> {
-    return this.http.patch(`${this.API_URL}/clientes/${cliente.id}/rejeitar`,{"motivo": motivo})
+    return this.http.patch(`${this.API_URL}/clientes/${cliente.id}/rejeitar`,{"motivo": motivo});
   }
 
+  aprovarCliente(cliente: ClientePendente): Observable<any>{
+    return this.http.post(`${this.API_URL}/clientes/${cliente.id}/aprovar`, cliente);
+  }
+  
   aprovar(cliente: Cliente): void {
   cliente.status = 'APROVADO';
   cliente.senha = 'tads';
@@ -56,7 +60,7 @@ export class GerenteService {
   
 
   console.log(`Cliente aprovado: ${JSON.stringify(cliente)}`);
-}     
+} // end aprovar()     
       
     carregarClientesAprovados(): Cliente[] {
       return JSON.parse(localStorage.getItem(LS_CHAVE) || '[]') as Cliente[];

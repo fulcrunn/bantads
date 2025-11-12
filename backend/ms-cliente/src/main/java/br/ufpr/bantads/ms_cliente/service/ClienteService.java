@@ -56,7 +56,9 @@ public class ClienteService {
             throw new IllegalArgumentException("Email já cadastrado");
         }
         System.out.println("Enviando comando para SAGA (Autocadastro) para o cliente: " + cliente.getCpf());
-        rabbitTemplate.convertAndSend(autocadastroExchange, autocadastroRoutingKey, cliente);        
+        rabbitTemplate.convertAndSend(autocadastroExchange, autocadastroRoutingKey, cliente);
+        // Observar que nesse ponto, nos bastidores, o jsonMessageConverter converte o cliente em um JSON
+        // Depois atribui a esse "pacote cliente" uma etiqueta que é autocadastro.iniciar.comando        
     }
 
     @RabbitListener(queues ="${rabbitmq.cliente.pendente.queue}")

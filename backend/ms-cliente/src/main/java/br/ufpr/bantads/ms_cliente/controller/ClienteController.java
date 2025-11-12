@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.ufpr.bantads.ms_cliente.service.ClienteService;
 import br.ufpr.bantads.ms_cliente.model.*;
 
-@RestController
+@RestController // indica que essa classe é um controlador REST, ou seja, que ela vai responder a requisições HTTP e expor endpoints da API
 @RequestMapping("/api/clientes/")
 public class ClienteController {
     
@@ -53,7 +53,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> getClienteById(@PathVariable Long id) {
+    public ResponseEntity<Cliente> getClienteById(@PathVariable("id") Long id) {
                 
         return clienteService.getClienteById(id).map(cliente -> ResponseEntity.ok().body(cliente))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)  );

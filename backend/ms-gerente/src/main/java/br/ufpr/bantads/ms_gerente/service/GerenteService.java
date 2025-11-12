@@ -10,6 +10,8 @@ import br.ufpr.bantads.ms_gerente.DTO.ClienteRejeitadoEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import br.ufpr.bantads.ms_gerente.DTO.ClienteAprovadoEvent;
 import br.ufpr.bantads.ms_gerente.DTO.ClientePendenteDTO;
 import br.ufpr.bantads.ms_gerente.DTO.GerentePorContaDTO;
 
@@ -20,6 +22,11 @@ public class GerenteService {
 
     @Value("${rabbitmq.cliente.rejeitado.exchange}")
     private String exchangeName;
+    @Value("${rabbitmq.aprovar.exchange}")
+    private String clienteAprovadoExchange;
+    @Value("${rabbitmq.aprovar.routingkey}")
+    private String clienteAprovadoRoutingKey;
+
     private final RabbitTemplate rabbitTemplate;
     private final RestTemplate restTemplate;
     private final GerenteRepository gerenteRepository;
@@ -52,10 +59,12 @@ public class GerenteService {
         }
     } // end buscarClientesPendentes
 
-    public void aprovarCliente(Long clienteId){ // verificar este método
-        String url = "http://localhost:8080/api/clientes/" + clienteId + "/aprovar";
-        restTemplate.patchForObject(url, null, Void.class);
-    }
+    public void aprovarCliente(Long clienteId, ClientePendenteDTO cliente){ // verificar este método
+        System.out.println("Solicitando aprovacao do cliente ID: " + clienteId);
+        ClienteAprovadoEvent event = new ClienteAprovadoEvent(clienteId, cliente.getIdGerente(),cliente.getSalario(),cliente.getEmail());  
+        // Envia o objeto 'event' para a exchange sem uma routing key específica
+    rabbitTemplate.convertAndSend(clienteAprovadoExchange,clienteAprovadoRoutingKey, event);
+    } // end aprovarCliente
 
     public Gerente criarNovoGerente(Gerente gerente) {
         if(gerenteRepository.findByCpf(gerente.getCpf()).isPresent()) {
@@ -69,7 +78,7 @@ public class GerenteService {
     }
 
     public Optional<Long> findGerenteComMenosContas(){
-        //IGNORANDO REQUISITO DE VERIFICAR O SALDO DO GERENTE PARA DESEMPATE, PEGAREI O COM MENOS CONTAS QUE APARECER PRIMEIRO
+        //IGNORANDO REQUISITO DE VERIFICAR O SALDO DO GERENTE PARA DESEMPATE, PEGAREI O COM MENOS CONTAS QUE APARECER PRIMEIROl
         String url = "http://localhost:8084/contas/contagem-por-gerente";
         // Lógica para encontrar o gerente com menos contas
         GerentePorContaDTO[] gerenteContasArray;
