@@ -4,8 +4,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;  
 import br.ufpr.bantads.ms_orquestrador.DTO.Cliente;
 import br.ufpr.bantads.ms_orquestrador.DTO.ClienteAprovadoEvent;
-import br.ufpr.bantads.ms_orquestrador.DTO.ClientePendenteDTO;
-
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +24,11 @@ public class orquestradorService {
     private String clientePendenteExchange;
     @Value("${rabbitmq.cliente.pendente.routingkey}")   
     private String clientePendenteRoutingKey;
+
+    @Value("${rabbitmq.cliente.registrar.exchange}")
+    private String registrarClienteExchante;
+    @Value("${cliente.registrar.cliente.comando}")
+    private String registrarClienteRoutingKey; 
 
     public orquestradorService(RabbitTemplate rabbitTemplate, RestTemplate restTemplate) {
         this.rabbitTemplate = rabbitTemplate;
@@ -52,7 +55,7 @@ public class orquestradorService {
     @RabbitListener(queues = "${rabbitmq.aprovar.queue}")
     public void aprovarCliente(ClienteAprovadoEvent evento){
         System.out.println("Recebido comando de APROVAÇÃO para o Cliente ID: " + evento.getIdCliente() + "gerido pelo gerente " + evento.getIdGerente());
-        rabbitTemplate.convertAndSend(clienteAprovadoRegistrarExchange, clienteAprovadoRegistrarRoutingKey, evento);                
+        rabbitTemplate.convertAndSend(registrarClienteExchante, registrarClienteRoutingKey, evento);                
         System.out.println("Orquestrador enviou para fila de registro de cliente: " + evento.getIdCliente());
     }
 
