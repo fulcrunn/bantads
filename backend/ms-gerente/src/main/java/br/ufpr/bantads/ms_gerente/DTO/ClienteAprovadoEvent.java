@@ -12,13 +12,15 @@ public class ClienteAprovadoEvent {
     private Long idGerente;
     private BigDecimal salario;
     private String email;
+    private String status;
 
     public ClienteAprovadoEvent(){}
 
-    public ClienteAprovadoEvent(Long idCliente,Long idGerente,BigDecimal salario,String email ){
+    public ClienteAprovadoEvent(Long idCliente,Long idGerente,BigDecimal salario,String email, String status ){
         this.idCliente = idCliente;
         this.idGerente = idGerente;
         this.salario = salario;
         this.email = email;
+        this.status = status;
     }
 }

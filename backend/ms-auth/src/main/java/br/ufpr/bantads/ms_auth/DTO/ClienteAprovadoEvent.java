@@ -1,7 +1,6 @@
-package br.ufpr.bantads.ms_orquestrador.DTO;
+package br.ufpr.bantads.ms_auth.DTO;
 
 import java.math.BigDecimal;
-
 import lombok.Data;
 
 @Data

@@ -10,9 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import br.ufpr.bantads.ms_auth.DTO.AuthDTO;
+import br.ufpr.bantads.ms_auth.DTO.ClienteAprovadoEvent;
 import br.ufpr.bantads.ms_auth.model.UserAuth;
 import br.ufpr.bantads.ms_auth.service.AuthService;
 import br.ufpr.bantads.ms_auth.service.JwtService;
+import br.ufpr.bantads.ms_auth.service.PasswordService;
 
 
 @RestController
@@ -22,11 +26,13 @@ public class AuthController {
     
     private final AuthService authService;
     private final JwtService jwtService;
+    private PasswordService passwordService;        
 
     @Autowired 
-    public AuthController(AuthService authService, JwtService jwtService) { 
+    public AuthController(AuthService authService, JwtService jwtService,PasswordService passwordService) { 
         this.authService = authService;
-        this.jwtService = jwtService; 
+        this.jwtService = jwtService;
+        //this.passwordService = passwordService; 
     }
     
     @PostMapping("/login")
@@ -54,6 +60,19 @@ public class AuthController {
             // Retorna 401 Unauthorized com a mensagem de erro
             return new ResponseEntity<>(erro, HttpStatus.UNAUTHORIZED);
         }
-    }    
+    }// end loginAuth
+    
+    @PostMapping("/criarLogin")
+    public AuthDTO criarLogin(@RequestBody ClienteAprovadoEvent evento) {        
+        String senhaAleatoria = passwordService.generateRandomPassword();
+        UserAuth novoUsuario = authService.createNewUser(evento.getEmail(), senhaAleatoria, UserAuth.TipoCliente.USUARIO);
+        AuthDTO retorno = new AuthDTO();
+        retorno.setLogin(novoUsuario.getLogin());
+        retorno.setSenha(senhaAleatoria);
+        
+        return retorno;
+    }
+    
+
 
 }

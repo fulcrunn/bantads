@@ -1,9 +1,13 @@
 package br.ufpr.bantads.ms_orquestrador.service;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Value;  
+import org.springframework.beans.factory.annotation.Value;
+
+import br.ufpr.bantads.ms_orquestrador.DTO.AuthDTO;
 import br.ufpr.bantads.ms_orquestrador.DTO.Cliente;
 import br.ufpr.bantads.ms_orquestrador.DTO.ClienteAprovadoEvent;
+import br.ufpr.bantads.ms_orquestrador.DTO.ContaDTO;
+
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,12 +29,22 @@ public class orquestradorService {
     @Value("${rabbitmq.cliente.pendente.routingkey}")   
     private String clientePendenteRoutingKey;
 
-    @Value("${rabbitmq.cliente.registrar.exchange}")
-    private String registrarClienteExchante;
-    @Value("${cliente.registrar.cliente.comando}")
-    private String registrarClienteRoutingKey; 
+    // O que vai consumir (escutar)
+    @Value("${rabbitmq.aprovar.queue}")
+    private String clienteAprovadoQueue;
 
-    public orquestradorService(RabbitTemplate rabbitTemplate, RestTemplate restTemplate) {
+    // Notificação para ms-cliente, ms-notificação, ms-conta, ms-auth
+    @Value("EXCHANGE_APROVAR_CLIENTE") 
+    private String sagaAprovarExchange;
+    @Value("mscliente.registrar.cliente.comando") 
+    private String aprovarMsClienteRoutingKey;
+    @Value("msconta.registrar.cliente.comando")
+    private String aprovarMsContaRoutingKey;
+     @Value("msauth.registrar.cliente.comando")
+    private String aprovarMsAuthRoutingKey;
+   
+
+    public orquestradorService(RabbitTemplate rabbitTemplate, RestTemplate restTemplate, ContaDTO contaDTO) {
         this.rabbitTemplate = rabbitTemplate;
         this.restTemplate = restTemplate;                
     }
@@ -42,8 +56,8 @@ public class orquestradorService {
     public void receberComandoAutocadastro(Cliente cliente) {
         String url = "http://localhost:8082/gerentes/gerente-menos-contas";
         try{
-            Long gerente = restTemplate.getForObject(url, Long.class);
-            cliente.setIdGerente(gerente);
+            Long gerenteId = restTemplate.getForObject(url, Long.class);
+            cliente.setIdGerente(gerenteId);
         } catch (Exception e) {
             System.out.println("Erro ao obter gerente com menos contas: " + e.getMessage());
             // Lógica de tratamento de erro, se necessário  
@@ -54,9 +68,37 @@ public class orquestradorService {
 
     @RabbitListener(queues = "${rabbitmq.aprovar.queue}")
     public void aprovarCliente(ClienteAprovadoEvent evento){
+        ContaDTO contaCriada;
+        AuthDTO authCriado;
         System.out.println("Recebido comando de APROVAÇÃO para o Cliente ID: " + evento.getIdCliente() + "gerido pelo gerente " + evento.getIdGerente());
-        rabbitTemplate.convertAndSend(registrarClienteExchante, registrarClienteRoutingKey, evento);                
-        System.out.println("Orquestrador enviou para fila de registro de cliente: " + evento.getIdCliente());
+        try{
+            evento.setStatus("APROVADO");            
+            rabbitTemplate.convertAndSend(sagaAprovarExchange, aprovarMsClienteRoutingKey, evento);
+        } catch (Exception e) {
+            System.err.println("SAGA Aprovar-ms-cliente FALHOU: " + e.getMessage());
+            return; // Para a SAGA
+        }               
+        System.out.println("Orquestrador enviou para fila de registro de ms-cliente: " + evento.getIdCliente());
+        
+        try{
+            String urlConta = "http://localhost:8084/contas/aprovarConta";             
+            // Enviamos os dados do evento (idCliente, salario, etc) e esperamos um ContaDTO de volta
+            contaCriada = restTemplate.postForObject(urlConta, evento, ContaDTO.class); 
+
+        } catch (Exception e) {
+            System.err.println("SAGA Aprovar-ms-conta FALHOU: " + e.getMessage());
+            return; // Para a SAGA
+        }               
+        System.out.println("Orquestrador enviou para fila de registro de ms-conta: " + evento.getIdCliente());
+        System.out.println("Conta criada. Número: " + contaCriada.getNumConta());
+
+        try{
+            String urlAuth = "http://localhost:8081/login/criarLogin"; 
+        } catch (Exception e) {
+            System.err.println("SAGA Aprovar-ms-auth FALHOU: " + e.getMessage());
+            return; // Para a SAGA
+        }               
+        System.out.println("Orquestrador enviou para fila de registro de ms-auth: " + evento.getIdCliente());
     }
 
     public void iniciarAutocadastro(Cliente cliente) {        

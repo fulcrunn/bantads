@@ -3,11 +3,8 @@ package br.ufpr.bantads.ms_gerente.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 
@@ -40,7 +37,3 @@ public class RabbitMQConfig {
     
 }
     
-//# SAGA - Aprovar cliente
-//rabbitmq.aprovar.queue=QUEUE_APROVACAO_INICIAR
-//rabbitmq.aprovar.exchange=EXCHANGE_APROVAR
-//rabbitmq.aprovar.routingkey=cliente.aprovar.comando

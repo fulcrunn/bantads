@@ -1,4 +1,4 @@
-package br.ufpr.bantads.ms_orquestrador.DTO;
+package br.ufpr.bantads.ms_conta.DTO;
 
 import java.math.BigDecimal;
 

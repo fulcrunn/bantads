@@ -1,0 +1,20 @@
+package br.ufpr.bantads.ms_orquestrador.DTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data // Gera Getters, Setters
+@AllArgsConstructor // Gera construtor com todos os argumentos
+@NoArgsConstructor
+
+public class AuthDTO {
+    private String login;
+    private String senha;
+    private TipoCliente tipo;  
+    public enum TipoCliente {
+        USUARIO,
+        GERENTE,
+        ADMINISTRADOR
+    }
+}

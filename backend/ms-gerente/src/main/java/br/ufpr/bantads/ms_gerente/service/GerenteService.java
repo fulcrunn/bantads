@@ -22,6 +22,7 @@ public class GerenteService {
 
     @Value("${rabbitmq.cliente.rejeitado.exchange}")
     private String exchangeName;
+    
     @Value("${rabbitmq.aprovar.exchange}")
     private String clienteAprovadoExchange;
     @Value("${rabbitmq.aprovar.routingkey}")
@@ -61,7 +62,7 @@ public class GerenteService {
 
     public void aprovarCliente(Long clienteId, ClientePendenteDTO cliente){ // verificar este método
         System.out.println("Solicitando aprovacao do cliente ID: " + clienteId);
-        ClienteAprovadoEvent event = new ClienteAprovadoEvent(clienteId, cliente.getIdGerente(),cliente.getSalario(),cliente.getEmail());  
+        ClienteAprovadoEvent event = new ClienteAprovadoEvent(clienteId, cliente.getIdGerente(),cliente.getSalario(),cliente.getEmail(),"");  
         // Envia o objeto 'event' para a exchange sem uma routing key específica
     rabbitTemplate.convertAndSend(clienteAprovadoExchange,clienteAprovadoRoutingKey, event);
     } // end aprovarCliente
