@@ -1,0 +1,39 @@
+<div class="container mt-4">
+  <h2>Relatório de Clientes</h2>
+
+  <div class="mb-3">
+    <input type="text" class="form-control" placeholder="Pesquisar por CPF ou Nome"
+           [(ngModel)]="filtro" (ngModelChange)="filtrarClientes()">
+  </div>
+
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>CPF Cliente</th>
+        <th>Nome Cliente</th>
+        <th>E-mail Cliente</th>
+        <th>Salário</th>
+        <th>Número Conta</th>
+        <th>Saldo</th>
+        <th>Limite</th>
+        <th>CPF Gerente</th>
+        <th>Nome Gerente</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of clientesFiltrados">
+        <td>{{ item.cliente.cpf }}</td>
+        <td>{{ item.cliente.nome }}</td>
+        <td>{{ item.cliente.email }}</td>
+        <td>{{ item.cliente.salario | currency:'BRL' }}</td>
+        <td>{{ item.cliente.numero }}</td>
+        <td [ngClass]="{'text-danger': item.cliente.saldo < 0, 'text-success': item.cliente.saldo >= 0}">
+          {{ item.cliente.saldo | currency:'BRL' }}
+        </td>
+        <td>{{ item.cliente.limite | currency:'BRL' }}</td>
+        <td>{{ item.gerente.cpf }}</td>
+        <td>{{ item.gerente.nome }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

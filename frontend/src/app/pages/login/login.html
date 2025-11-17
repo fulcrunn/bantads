@@ -1,0 +1,21 @@
+<div class="container">
+    <h2>Login</h2>
+    <form (ngSubmit)="fazerLogin()">
+        <div class="form-group">
+            <label for="email"> <!-- o 'for' faz uma referência a termo 'email' lá no input -->
+                Email:
+            </label>
+            <input type="email" id="email" name="email" [(ngModel)]="credenciaisUsuario.login" required> 
+        </div>
+        <div class="form-group">
+            <label for="senha">
+                Senha:
+            </label>
+            <input type="password" id="senha" name="senha" [(ngModel)]="credenciaisUsuario.senha" required>          
+        </div>
+        <button type="submit">Entrar</button>
+    </form>
+    <p *ngIf="mensagemErro"> {{ mensagemErro }} </p>
+    <br>
+    <p>Não tem conta? <a routerLink="/autocadastro">Cadastre-se aqui!</a></p>
+</div>
