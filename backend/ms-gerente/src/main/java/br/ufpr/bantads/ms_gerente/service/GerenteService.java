@@ -10,7 +10,8 @@ import br.ufpr.bantads.ms_gerente.DTO.ClienteRejeitadoEvent;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 import br.ufpr.bantads.ms_gerente.DTO.ClienteAprovadoEvent;
 import br.ufpr.bantads.ms_gerente.DTO.ClientePendenteDTO;
 import br.ufpr.bantads.ms_gerente.DTO.GerentePorContaDTO;
@@ -78,7 +79,7 @@ public class GerenteService {
         // Aqui você pode adicionar a lógica para salvar o gerente no banco de dados
     }
 
-    public Optional<Long> findGerenteComMenosContas(){
+   /** public Optional<Long> findGerenteComMenosContas(){
         //IGNORANDO REQUISITO DE VERIFICAR O SALDO DO GERENTE PARA DESEMPATE, PEGAREI O COM MENOS CONTAS QUE APARECER PRIMEIROl
         String url = "http://localhost:8084/contas/contagem-por-gerente";
         // Lógica para encontrar o gerente com menos contas
@@ -104,6 +105,47 @@ public class GerenteService {
         } 
 
         return idGerente;
+    } //end findGerenteComMenosContas */
+
+    public Optional<Long> findGerenteComMenosContas(){
+        // 1. Buscar TODOS os gerentes do banco de dados do ms-gerente
+        List<Gerente> todosGerentes = gerenteRepository.findAll();
+
+        if (todosGerentes.isEmpty()) {
+            System.out.println("Não há gerentes cadastrados no sistema.");
+            return Optional.empty();
+        }
+
+        // 2. Buscar as contagens do ms-conta (como você já faz)
+        String url = "http://localhost:8084/contas/contagem-por-gerente";
+        GerentePorContaDTO[] gerenteContasArray;
+        try{
+            gerenteContasArray = restTemplate.getForObject(url, GerentePorContaDTO[].class);
+        } catch (Exception e){
+            System.out.println("Erro ao chamar MS-Conta: " + e.getMessage());
+            // Se o ms-conta falhar, não podemos decidir.
+            // Uma política mais robusta poderia tentar novamente ou retornar o primeiro.
+            // Por simplicidade, retornamos o primeiro gerente.
+            return todosGerentes.stream().findFirst().map(Gerente::getId);
+        }
+        
+        List<GerentePorContaDTO> gerenteContasList = (gerenteContasArray != null) ? Arrays.asList(gerenteContasArray) : List.of();
+
+        // 3. Criar um Mapa com a contagem final, iniciando todos os gerentes com 0
+        Map<Long, Long> contagemFinal = todosGerentes.stream()
+            .collect(Collectors.toMap(Gerente::getId, g -> 0L)); // Inicializa todos com 0
+
+        // 4. Atualizar o mapa com as contagens reais vindas do ms-conta
+        gerenteContasList.forEach(dto -> 
+            contagemFinal.put(dto.getIdGerente(), dto.getQuantidadeContas())
+        );
+
+        // 5. Encontrar o gerente com menos contas (agora incluindo os que têm 0)
+        Optional<Map.Entry<Long, Long>> gerenteComMenosContas = contagemFinal.entrySet().stream()
+            .min(Map.Entry.comparingByValue());
+
+        // Retorna o ID do gerente encontrado
+        return gerenteComMenosContas.map(Map.Entry::getKey);
     }
     
 }
