@@ -1,0 +1,176 @@
+version: '3.8'
+
+services:
+  # --------------------------------------------------
+  # SERVIÇOS DE INFRAESTRUTURA
+  # --------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    environment:
+      # Credenciais do ms-cliente/src/main/resources/application.properties
+      - POSTGRES_DB=bantadsdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb_db
+    # A porta padrão do MongoDB (ms-auth/src/main/resources/application.properties)
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_broker
+    # Credenciais do ms-cliente/src/main/resources/application.properties
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672" # Porta da mensageria (AMQP)
+      - "15672:15672" # Porta da UI de Gerenciamento
+
+  # --------------------------------------------------
+  # BACKEND MICROSSERVIÇOS (JAVA)
+  # --------------------------------------------------
+  ms-cliente:
+    build:
+      context: ./backend/ms-cliente # Caminho do Dockerfile
+      dockerfile: Dockerfile
+    container_name: ms_cliente
+    environment:
+      # Variáveis necessárias para se conectar ao DB e RabbitMQ dentro da rede Docker
+      - spring.datasource.url=jdbc:postgresql://postgres:5432/bantadsdb
+      - spring.rabbitmq.host=rabbitmq
+      # ... outros rabbitmq.* properties
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  ms-auth:
+    build:
+      context: ./backend/ms-auth
+      dockerfile: Dockerfile
+    container_name: ms_auth
+    environment:
+      # Credencial do JWT (ms-auth/src/main/resources/application.properties)
+      - key.jwt.secret=bWluaGFDaGF2ZVN1cGVyU2VjcmV0YVBhcmFBc3NpbmFyVG9rZW5zSldURG9CYW50YWRz
+      - spring.data.mongodb.uri=mongodb://mongodb:27017/bantads_auth
+      - spring.rabbitmq.host=rabbitmq
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  ms-gerente:
+    build:
+      context: ./backend/ms-gerente
+      dockerfile: Dockerfile
+    container_name: ms_gerente
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgres:5432/bantadsdb
+      - spring.rabbitmq.host=rabbitmq
+      # Variável de porta do ms-conta para o serviço GerenteService.java (localhost:8084)
+      - MS_CONTA_URL=http://ms-conta:8084 
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - ms-conta # Depende do ms-conta para buscar a contagem
+
+  ms-notificacao:
+    build:
+      context: ./backend/ms-notificacao
+      dockerfile: Dockerfile
+    container_name: ms_notificacao
+    environment:
+      # Variáveis para conexão SMTP (ms-notificacao/src/main/resources/application.properties)
+      - SMTP_KEY=${SMTP_KEY} # Variável de ambiente do host, ou defina um valor fixo
+      - spring.rabbitmq.host=rabbitmq
+      - MS_CLIENTE_URL=http://ms-cliente:8080 # Para buscar o email (NotificacaoListener.java)
+    ports:
+      - "8083:8083"
+    depends_on:
+      - rabbitmq
+      - ms-cliente
+
+  ms-conta:
+    build:
+      context: ./backend/ms-conta
+      dockerfile: Dockerfile
+    container_name: ms_conta
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgres:5432/bantadsdb
+      - spring.rabbitmq.host=rabbitmq
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  ms-orquestrador:
+    build:
+      context: ./backend/ms-orquestrador
+      dockerfile: Dockerfile
+    container_name: ms_orquestrador
+    environment:
+      - spring.datasource.url=jdbc:postgresql://postgres:5432/bantadsdb
+      - spring.rabbitmq.host=rabbitmq
+      # URLs dos microsserviços para chamadas REST síncronas (orquestradorService.java)
+      - MS_GERENTE_URL=http://ms-gerente:8082
+      - MS_AUTH_URL=http://ms-auth:8081
+      - MS_CONTA_URL=http://ms-conta:8084
+    ports:
+      - "8085:8085"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - ms-gerente # Orquestrador precisa do ms-gerente
+
+  # --------------------------------------------------
+  # API GATEWAY (NODE.JS)
+  # --------------------------------------------------
+  api-gateway:
+    build:
+      context: ./apiGateway
+      dockerfile: Dockerfile
+    container_name: api_gateway
+    environment:
+      # As rotas no gateway.js já usam localhost, mas dentro do Docker, elas devem usar os nomes dos serviços:
+      - MS_CLIENTE_HOST=ms-cliente
+      - MS_AUTH_HOST=ms-auth
+      - MS_GERENTE_HOST=ms-gerente
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ms-cliente
+      - ms-auth
+      - ms-gerente
+
+  # --------------------------------------------------
+  # FRONTEND (ANGULAR / NGINX)
+  # --------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend_web
+    ports:
+      - "80:80" # Porta padrão HTTP
+    depends_on:
+      - api-gateway
+
+volumes:
+  postgres_data:
+  mongo_data:
