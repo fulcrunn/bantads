@@ -108,4 +108,8 @@ public class ClienteService {
     public Optional<Cliente> getClienteById(Long id) {
         return clienteRepository.findById(id);
     }
+    //ritorna o uma lista de clientes dado o gerente
+    public List<Cliente> getClientesPendentesPorGerente(Long idGerente) {
+    return clienteRepository.findByStatusAndIdGerente(Cliente.StatusCliente.PENDENTE, idGerente);
+}
 }

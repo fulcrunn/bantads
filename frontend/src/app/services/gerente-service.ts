@@ -34,9 +34,10 @@ export class GerenteService {
   }
 }
 
-  listarClientesPendentes(): Observable<ClientePendente[]>{
-    return this.http.get<ClientePendente[]>(`${this.API_URL}/clientes-pendentes`);
-  }
+  listarClientesPendentes(idGerente: string): Observable<ClientePendente[]>{
+  // O this.API_URL é 'http://localhost:3000/gerentes'
+  return this.http.get<ClientePendente[]>(`${this.API_URL}/${idGerente}/clientes-pendentes`);
+}
 
   rejeitarCliente(cliente: ClientePendente, motivo: String): Observable<any> {
     return this.http.patch(`${this.API_URL}/clientes/${cliente.id}/rejeitar`,{"motivo": motivo});

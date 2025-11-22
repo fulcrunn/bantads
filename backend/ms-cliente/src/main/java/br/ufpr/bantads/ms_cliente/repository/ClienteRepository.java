@@ -17,5 +17,6 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     public List<Cliente> findByStatus(StatusCliente status);
     
-    
+    // busca clientes por gerente e status
+    public List<Cliente> findByStatusAndIdGerente(StatusCliente status, Long idGerente);
 }

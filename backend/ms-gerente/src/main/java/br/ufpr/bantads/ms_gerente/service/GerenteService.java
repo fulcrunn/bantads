@@ -50,16 +50,18 @@ public class GerenteService {
     System.out.println("Mensagem de rejeição enviada para a exchange: " + exchangeName);
 } // rejeitarCliente
 
-    public List<ClientePendenteDTO> buscarClientesPendentes(){
-        String url = "http://localhost:8080/api/clientes/pendentes";
+    public List<ClientePendenteDTO> buscarClientesPendentes(Long idGerente){
+    // Chama o endpoint filtrado do ms-cliente (lá na porta 8080)
+        String url = "http://localhost:8080/api/clientes/pendentes/gerente/" + idGerente;
+        
         ClientePendenteDTO[] clientesArray = restTemplate.getForObject(url, ClientePendenteDTO[].class);
         
         if (clientesArray != null) {
-        return Arrays.asList(clientesArray);
+            return Arrays.asList(clientesArray);
         } else {
             return List.of(); // Retorna uma lista vazia se a resposta for nula
         }
-    } // end buscarClientesPendentes
+} // end buscarClientesPendentes
 
     public void aprovarCliente(Long clienteId, ClientePendenteDTO cliente){ // verificar este método
         System.out.println("Solicitando aprovacao do cliente ID: " + clienteId);
@@ -147,5 +149,9 @@ public class GerenteService {
         // Retorna o ID do gerente encontrado
         return gerenteComMenosContas.map(Map.Entry::getKey);
     }
+
+    public Optional<Long> findIdByEmail(String email) {
+        return gerenteRepository.findByEmail(email).map(Gerente::getId);
+}
     
 }

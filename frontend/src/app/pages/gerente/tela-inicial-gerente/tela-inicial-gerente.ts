@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalRejeitarClienteComponent } from '../modal-rejeitarcliente/modal-rejeitarcliente';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -21,32 +21,40 @@ const LS_CHAVE_TEMP = "clientesPendentes"
 export class TelaInicialGerente {
   clientesPendentes: ClientePendente[] = [];
   clientesAprovados: Cliente[] = [];
+  private idGerenteLogado: string | null = null;
   
   mensagem: string = '';
 
-  constructor(private modalService: NgbModal,private gerenteService: GerenteService
-  ) {
-  }
+  constructor(private modalService: NgbModal, private gerenteService: GerenteService) {
+    // Vai recuperar o ID do gerente logado (tá salvo lá na chave 'currentUser')
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (currentUser && currentUser.tipo === 'GERENTE' && currentUser.id) {
+        this.idGerenteLogado = currentUser.id;
+    }
+}
 
-  ngOnInit() {
+ngOnInit() {
   this.listarPendentes();
-  console.log(this.clientesPendentes)
-  
-  }
+}
 
   listarPendentes() {
-  this.gerenteService.listarClientesPendentes()
+  if (!this.idGerenteLogado) {
+    this.mensagem = 'Erro: Gerente não identificado. Faça login novamente.';
+    console.error('ID do gerente logado não encontrado no localStorage.');
+    return;
+  }
+
+  this.gerenteService.listarClientesPendentes(this.idGerenteLogado) 
     .subscribe({
       next: (listaRecebida) => { 
         this.clientesPendentes = listaRecebida;
-        console.log('Clientes Pendentes Recebidos:', listaRecebida);
       },
       error: (erro) => {
         console.error('Erro ao buscar clientes pendentes:', erro);
         this.mensagem = 'Erro ao carregar clientes pendentes.';
       }
     });
-}  
+} // end listaPendentes
 
   aprovar(cliente: ClientePendente) {
   this.gerenteService.aprovarCliente(cliente).subscribe({

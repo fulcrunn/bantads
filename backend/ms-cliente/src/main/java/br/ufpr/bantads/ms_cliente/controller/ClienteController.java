@@ -29,6 +29,7 @@ public class ClienteController {
         return clienteService.getAllClientes();
     }
 
+    // manter esse método para eventual necessidade
     @GetMapping("/pendentes")
     public List<Cliente> getClientesPendentes() {
         return clienteService.getClientesPorStatus(Cliente.StatusCliente.PENDENTE);
@@ -58,5 +59,10 @@ public class ClienteController {
         return clienteService.getClienteById(id).map(cliente -> ResponseEntity.ok().body(cliente))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND)  );
     }
+
+    @GetMapping("/pendentes/gerente/{idGerente}")
+    public List<Cliente> getClientesPendentesPorGerente(@PathVariable("idGerente") Long idGerente) {
+        return clienteService.getClientesPendentesPorGerente(idGerente);
+}
     
 }

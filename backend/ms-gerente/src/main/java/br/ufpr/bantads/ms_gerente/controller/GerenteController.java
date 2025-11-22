@@ -28,11 +28,20 @@ public class GerenteController {
         
     }   
 
-    @GetMapping("/clientes-pendentes")
-    public List<ClientePendenteDTO> getAllClientesPendentes() {
-       
-        return gerenteService.buscarClientesPendentes();
-    }
+    @GetMapping("/{idGerente}/clientes-pendentes")
+        public List<ClientePendenteDTO> getClientesPendentesPorGerente(@PathVariable String idGerente) {
+            Long gerenteId;
+            try {
+                // Tenta converter para Long (o ID esperado do PostgreSQL)
+                gerenteId = Long.parseLong(idGerente);
+            } catch (NumberFormatException e) {
+                // Se a conversão falhar (porque é um ID MongoDB String), retorna lista vazia e loga.
+                System.err.println("ALERTA: ID do Gerente é um ID MongoDB. A filtragem está retornando lista vazia. O mapeamento ID MongoDB -> ID Relacional falhou.");
+                return List.of(); 
+            }
+            // Se for um Long válido, continua com a lógica
+            return gerenteService.buscarClientesPendentes(gerenteId);
+}
 
     @PatchMapping("/clientes/{id}/rejeitar") // Usando PATCH e PathVariable para ID
         public ResponseEntity<Void> rejeitarCliente(@PathVariable Long id, @RequestBody Map<String, String> payload) {
@@ -58,4 +67,12 @@ public class GerenteController {
        
         return gerenteService.findGerenteComMenosContas();
     }
-}
+
+    //endpoint de ligação entre o postgres e o mongo de autenticação
+    @GetMapping("/id-by-login/{login}")
+    public ResponseEntity<Long> getGerenteIdByLogin(@PathVariable("login") String login) {
+        return gerenteService.findIdByEmail(login)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+} // end class

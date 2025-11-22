@@ -22,11 +22,15 @@ public class InitialDataLoader implements CommandLineRunner {
         criarUtilizadoresIniciais();
         System.out.println("DataLoader inicial concluído.");
     } // run
-    
+
     private void criarUtilizadoresIniciais() {
         // Administrador
         criarUtilizadorSeNaoExistir("admin@bantads.com.br", "admin", UserAuth.TipoCliente.ADMINISTRADOR);
-                
+        
+        // Gerentes (ADICIONE ESTAS LINHAS)
+        criarUtilizadorSeNaoExistir("ger1@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE); 
+        criarUtilizadorSeNaoExistir("ger2@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE); 
+        criarUtilizadorSeNaoExistir("ger3@bantads.com.br", "tads", UserAuth.TipoCliente.GERENTE); 
     }
     private void criarUtilizadorSeNaoExistir(String login, String senha, UserAuth.TipoCliente tipo) {
         try {
