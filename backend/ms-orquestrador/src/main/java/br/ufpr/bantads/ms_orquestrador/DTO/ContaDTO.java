@@ -3,6 +3,8 @@ package br.ufpr.bantads.ms_orquestrador.DTO;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +25,14 @@ public class ContaDTO {
     private Long idGerente;
     private String numConta;
     private BigDecimal saldo;
-    private BigDecimal limite;
+    private BigDecimal limite;   
     private Date abertura;
+    @Enumerated(EnumType.STRING)
+    private StatusConta status;
+
+    public enum StatusConta{
+        ATIVA,
+        INATIVA
+    }
     
 }

@@ -30,6 +30,10 @@ public class ClienteService {
     private String clientePendenteExchange;
     @Value("${rabbitmq.cliente.pendente.routingkey}")   
     private String clientePendenteRoutingKey;
+    @Value("${rabbitmq.cliente.criado.exchange}")
+    private String clienteCriadoExchange;
+    @Value("${rabbitmq.cliente.criado.routingkey}")
+    private String clienteCriadoRoutingKey;
 
     public ClienteService(ClienteRepository clienteRepository,RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
@@ -86,7 +90,11 @@ public class ClienteService {
     public void cadastrarClientePendente(Cliente cliente) {
         System.out.println("Cadastrando cliente pendente ID: " + cliente.getId() + " CPF: " + cliente.getCpf());
         cliente.setStatus(StatusCliente.PENDENTE);
-        clienteRepository.save(cliente);
+        // salva a instância com o ID gerado pelo banco
+        Cliente clienteSalvo = clienteRepository.save(cliente);
+        System.out.println("Publicando evento Cliente Criado com ID: " + clienteSalvo.getId());
+        rabbitTemplate.convertAndSend(clienteCriadoExchange, clienteCriadoRoutingKey, clienteSalvo);
+        System.out.println("Cliente pendente salvo com sucesso: " + clienteSalvo.getId());
     }
 
     public List<Cliente> getAllClientes() {

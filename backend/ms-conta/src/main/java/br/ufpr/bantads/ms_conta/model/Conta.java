@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,12 +18,20 @@ public class Conta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Pede ao banco para gerar os IDs automaticamente
     private Long id;
-
+    
     private Long idCliente;
     private String numConta;
     private BigDecimal saldo;
     private BigDecimal limite;
     private Long idGerente;
     private Date abertura;
+    @Enumerated(EnumType.STRING)
+    private StatusConta status;
+
+    public enum StatusConta{
+        ATIVA,
+        INATIVA
+    }
+
 
 }

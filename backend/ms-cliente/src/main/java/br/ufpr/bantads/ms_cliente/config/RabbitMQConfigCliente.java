@@ -40,6 +40,11 @@ public class RabbitMQConfigCliente {
     @Value("${rabbitmq.aprovar.routingkey.cliente}")
     private String aprovarRoutingKeyCliente;
 
+    @Value("${rabbitmq.cliente.criado.exchange}")
+    private String clienteCriadoExchange;
+    @Value("${rabbitmq.cliente.criado.routingkey}")
+    private String clienteCriadoRoutingKey;
+
     // Declaração do Exchange para cliente rejeitado
     @Bean
     public FanoutExchange clienteRejeitadoExchange() {
@@ -97,5 +102,10 @@ public class RabbitMQConfigCliente {
         return BindingBuilder.bind(aprovarQueueCliente)
                             .to(aprovarExchange)
                             .with(aprovarRoutingKeyCliente);
+    }
+
+    @Bean
+    public DirectExchange clienteCriadoExchange() {
+        return new DirectExchange(clienteCriadoExchange, true, false);
     }
 }

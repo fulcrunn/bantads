@@ -7,7 +7,7 @@ import br.ufpr.bantads.ms_orquestrador.DTO.AuthDTO;
 import br.ufpr.bantads.ms_orquestrador.DTO.Cliente;
 import br.ufpr.bantads.ms_orquestrador.DTO.ClienteAprovadoEvent;
 import br.ufpr.bantads.ms_orquestrador.DTO.ContaDTO;
-
+import br.ufpr.bantads.ms_orquestrador.DTO.ComandoCriarContaDTO;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +18,7 @@ public class orquestradorService {
     private final RabbitTemplate rabbitTemplate;
     private final RestTemplate restTemplate;
 
-    @Value("${rabbitmq.autocadastro.exchange}")
+   @Value("${rabbitmq.autocadastro.exchange}")
     private String autocadastroExchange;    
     @Value("${rabbitmq.autocadastro.routingkey}")
     private String autocadastroRoutingKey;
@@ -32,15 +32,21 @@ public class orquestradorService {
     // O que vai consumir (escutar)
     @Value("${rabbitmq.aprovar.queue}")
     private String clienteAprovadoQueue;
+    
+    @Value("${rabbitmq.conta.exchange}") 
+    private String contaExchange; // Exchange para R1/Conta INATIVA
+    @Value("${rabbitmq.conta.routingkey}")
+    private String contaRoutingKey; // Routing Key para R1/Conta INATIVA
 
     // Notificação para ms-cliente, ms-notificação, ms-conta, ms-auth
-    @Value("EXCHANGE_APROVAR_CLIENTE") 
+    // CORREÇÃO: Usando as chaves corretas que estão no properties
+    @Value("${rabbitmq.cliente.registrar.exchange}") 
     private String sagaAprovarExchange;
-    @Value("mscliente.registrar.cliente.comando") 
+    @Value("${rabbitmq.mscliente.registrar.routingkey}") 
     private String aprovarMsClienteRoutingKey;
-    @Value("msconta.registrar.cliente.comando")
+    @Value("${rabbitmq.msconta.registrar.routingkey}")
     private String aprovarMsContaRoutingKey;
-     @Value("msauth.registrar.cliente.comando")
+    @Value("${rabbitmq.msauth.registrar.routingkey}")
     private String aprovarMsAuthRoutingKey;
    
 
@@ -63,12 +69,15 @@ public class orquestradorService {
             // Lógica de tratamento de erro, se necessário  
         }
         System.out.println("Orquestrador recebeu comando de autocadastro para o cliente: " + cliente.getCpf());
-        iniciarAutocadastro(cliente);
+        try{
+            rabbitTemplate.convertAndSend(clientePendenteExchange, clientePendenteRoutingKey, cliente);
+        }catch (Exception e){
+            System.out.println("Erro na exchange clientePendenteExchante: " + e.getMessage());
+        }
     }
 
     @RabbitListener(queues = "${rabbitmq.aprovar.queue}")
     public void aprovarCliente(ClienteAprovadoEvent evento){
-        ContaDTO contaCriada;
         AuthDTO authCriado;
         System.out.println("Recebido comando de APROVAÇÃO para o Cliente ID: " + evento.getIdCliente() + " gerido pelo gerente " + evento.getIdGerente());
         try{
@@ -81,17 +90,16 @@ public class orquestradorService {
         System.out.println("Orquestrador enviou para fila de registro de ms-cliente: " + evento.getIdCliente());
         System.out.println("Status do cliente " + evento.getIdCliente() + " é " + evento.getStatus() );
         
+        // NOVO: Chamada REST para ATIVAR a conta (ms-conta)
         try{
-            String urlConta = "http://localhost:8084/contas/aprovarConta";             
-            // Enviamos os dados do evento (idCliente, salario, etc) e esperamos um ContaDTO de volta
-            contaCriada = restTemplate.postForObject(urlConta, evento, ContaDTO.class); 
-
+            String urlAtivarConta = "http://localhost:8084/contas/ativar/" + evento.getIdCliente();              
+            // Usa PUT para atualizar o status de INATIVA para ATIVA
+            restTemplate.put(urlAtivarConta, null); 
         } catch (Exception e) {
-            System.err.println("SAGA Aprovar-ms-conta FALHOU: " + e.getMessage());
+            System.err.println("SAGA Aprovar-ms-conta FALHOU (Ativação): " + e.getMessage());
             return; // Para a SAGA
         }               
         System.out.println("Orquestrador enviou para fila de registro de ms-conta: " + evento.getIdCliente());
-        System.out.println("Conta criada. Número: " + contaCriada.getNumConta());
 
         try{
             String urlAuth = "http://localhost:8081/auth/criarLogin"; 
@@ -104,9 +112,25 @@ public class orquestradorService {
             System.out.println("Orquestrador enviou para fila de registro de ms-auth: " + evento.getIdCliente());
     }
 
-    public void iniciarAutocadastro(Cliente cliente) {        
-        // Enviar mensagem para a fila de autocadastro
-        rabbitTemplate.convertAndSend(clientePendenteExchange, clientePendenteRoutingKey, cliente);                
-        System.out.println("Orquestrador enviou para fila o cliente: " + cliente.getCpf());
+    @RabbitListener(queues = "${rabbitmq.cliente.criado.queue}")
+        public void receberEventoClienteCriado(Cliente clienteCriado) {
+        System.out.println("Orquestrador recebeu evento Cliente Criado com ID: " + clienteCriado.getId() + " - Prosseguindo para criar conta INATIVA.");
+        
+        // Prepara DTO para criação da Conta INATIVA
+        ComandoCriarContaDTO comandoConta = new ComandoCriarContaDTO(
+            clienteCriado.getId(), 
+            clienteCriado.getIdGerente(), 
+            clienteCriado.getSalario()
+        );
+        
+        // CORREÇÃO: Usando as chaves R1/Conta INATIVA
+        try{
+            rabbitTemplate.convertAndSend(contaExchange, contaRoutingKey, comandoConta); 
+            System.out.println("Comando para criar Conta INATIVA enviado para ms-conta.");
+        }catch(Exception e){
+            System.out.println("Houve erro no envio de conta inativa:" + e.getMessage());
+        }
     }
+
+    
 }

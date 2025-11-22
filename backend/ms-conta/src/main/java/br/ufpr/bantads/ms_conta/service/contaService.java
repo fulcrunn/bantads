@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.ufpr.bantads.ms_conta.DTO.ComandoCriarContaDTO;
 import br.ufpr.bantads.ms_conta.DTO.GerentePorContaDTO;
 import br.ufpr.bantads.ms_conta.model.Conta;
+import br.ufpr.bantads.ms_conta.model.Conta.StatusConta;
 import br.ufpr.bantads.ms_conta.repository.ContaRepository;
 
 @Service
@@ -60,9 +61,18 @@ public class contaService {
         novaConta.setLimite(limite);
         novaConta.setSaldo(saldoInicial);
         novaConta.setAbertura(dataAbertura);
+        novaConta.setStatus(StatusConta.INATIVA);
 
         //Salva no banco e retorna o objeto salvo
         return contaRepository.save(novaConta);
+    }
+
+    public void ativarConta(Long idCliente){
+        Conta conta = contaRepository.findByIdCliente(idCliente);
+        if(conta != null){
+            conta.setStatus(StatusConta.ATIVA);
+            contaRepository.save(conta);
+        }
     }
 
     @RabbitListener(queues = "${rabbitmq.aprovacao.queue.conta}")

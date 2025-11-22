@@ -29,7 +29,14 @@ public class RabbitMQConfigOrquestrador {
     private String clienteAprovadoRoutingKey;
 
     @Value("${rabbitmq.cliente.registrar.exchange}")
-    private String registrarClienteExchante;    
+    private String registrarClienteExchante;  
+    
+    @Value("${rabbitmq.cliente.criado.exchange}")
+    private String clienteCriadoExchange;
+    @Value("${rabbitmq.cliente.criado.queue}")
+    private String clienteCriadoQueue;
+    @Value("${rabbitmq.cliente.criado.routingkey}")
+    private String clienteCriadoRoutingKey;
 
     @Bean // Define um Bean gerenciado pelo Spring
     public MessageConverter jsonMessageConverter() {
@@ -79,4 +86,21 @@ public class RabbitMQConfigOrquestrador {
         return new DirectExchange(registrarClienteExchante, true, false);
     }
     
+   // Declaração da Exchange para Cliente Criado
+    @Bean
+    public DirectExchange clienteCriadoExchange() {
+        return new DirectExchange(clienteCriadoExchange, true, false);
+    }
+    
+    // Declaração da Fila para Cliente Criado
+    @Bean
+    public Queue clienteCriadoQueue() {
+        return new Queue(clienteCriadoQueue, true);
+    }
+
+    // Binding entre a fila e a exchange
+    @Bean
+    public Binding bindingClienteCriado(Queue clienteCriadoQueue, DirectExchange clienteCriadoExchange) {
+        return BindingBuilder.bind(clienteCriadoQueue).to(clienteCriadoExchange).with(clienteCriadoRoutingKey);
+    }
 } //end rabbitmqconfigorquestrador
