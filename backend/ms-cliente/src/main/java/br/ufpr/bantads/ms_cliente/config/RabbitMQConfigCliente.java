@@ -49,7 +49,7 @@ public class RabbitMQConfigCliente {
     @Bean
     public FanoutExchange clienteRejeitadoExchange() {
         // O nome deve ser exatamente o mesmo que o ms-gerente está a usar
-        return new FanoutExchange(clienteRejeitadoExchange, true, true); // true = durável
+        return new FanoutExchange(clienteRejeitadoExchange, true, false); // 
     }
 
     // Declaração da Fila para notificações de cliente rejeitado
