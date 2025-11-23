@@ -11,6 +11,11 @@ COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
 
+# LINHA A SER ADICIONADA: Dá permissão de execução ao Maven Wrapper
+RUN chmod +x mvnw 
+
+# Baixa dependências e instala...
+RUN ./mvnw dependency:go-offline
 # Baixa dependências e instala (otimiza o cache se o pom.xml não mudar)
 # Usa volume de cache (buildkit) para o repositório Maven
 # Certifique-se de que o seu shell suporta a sintaxe --mount=type=cache (Docker BuildKit)
