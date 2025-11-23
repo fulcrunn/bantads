@@ -3,6 +3,7 @@ package br.ufpr.bantads.ms_auth.controller;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +28,10 @@ public class AuthController {
     private final AuthService authService;
     private final JwtService jwtService;
     private final RestTemplate restTemplate;
-    private PasswordService passwordService;        
+    private PasswordService passwordService;
+    
+    @Value("${ms-service.url.ms-gerente}") // Docker
+    private String msGerenteUrl;
 
     /*@Autowired // remover após testes
     public AuthController(AuthService authService, JwtService jwtService,PasswordService passwordService) { 
@@ -56,7 +60,7 @@ public class AuthController {
             // SE o usuário for GERENTE, buscamos o ID Relacional (Long)
             if (usuarioAutenticado.getTipo() == UserAuth.TipoCliente.GERENTE) {
                 String login = usuarioAutenticado.getLogin();
-                String url = "http://localhost:8082/gerentes/id-by-login/" + login;
+                String url = msGerenteUrl + "/gerentes/id-by-login/" + login; // Docker
                 try {
                     // Espera um Long e converte para String para o JSON
                     Long gerenteRelationalId = restTemplate.getForObject(url, Long.class);

@@ -147,8 +147,8 @@ services:
       dockerfile: Dockerfile
     container_name: api_gateway
     environment:
-      # As rotas no gateway.js já usam localhost, mas dentro do Docker, elas devem usar os nomes dos serviços:
-      - MS_CLIENTE_HOST=ms-cliente
+      # ATUALIZAÇÃO NECESSÁRIA:
+      - MS_CLIENTE_HOST=ms-cliente 
       - MS_AUTH_HOST=ms-auth
       - MS_GERENTE_HOST=ms-gerente
     ports:

@@ -18,7 +18,14 @@ public class orquestradorService {
     private final RabbitTemplate rabbitTemplate;
     private final RestTemplate restTemplate;
 
-   @Value("${rabbitmq.autocadastro.exchange}")
+    @Value("${ms-service.url.ms-gerente}") // Docker
+    private String msGerenteUrl;
+    @Value("${ms-service.url.ms-conta}") // Docker
+    private String msContaUrl;
+    @Value("${ms-service.url.ms-auth}") // Docker
+    private String msAuthUrl;
+
+    @Value("${rabbitmq.autocadastro.exchange}")
     private String autocadastroExchange;    
     @Value("${rabbitmq.autocadastro.routingkey}")
     private String autocadastroRoutingKey;
@@ -60,7 +67,7 @@ public class orquestradorService {
     // O jsonMessageConverter, nos bastidores, converte o JSON para um tipo Cliente e entrega ao método   
     @RabbitListener(queues = "${rabbitmq.autocadastro.queue}")
     public void receberComandoAutocadastro(Cliente cliente) {
-        String url = "http://localhost:8082/gerentes/gerente-menos-contas";
+        String url = msGerenteUrl + "/gerentes/gerente-menos-contas"; //Docker
         try{
             Long gerenteId = restTemplate.getForObject(url, Long.class);
             cliente.setIdGerente(gerenteId);
@@ -91,18 +98,18 @@ public class orquestradorService {
         System.out.println("Status do cliente " + evento.getIdCliente() + " é " + evento.getStatus() );
         
         // NOVO: Chamada REST para ATIVAR a conta (ms-conta)
-        try{
-            String urlAtivarConta = "http://localhost:8084/contas/ativar/" + evento.getIdCliente();              
+       try{
+            String urlAtivarConta = msContaUrl + "/contas/ativar/" + evento.getIdCliente(); // Docker        
             // Usa PUT para atualizar o status de INATIVA para ATIVA
             restTemplate.put(urlAtivarConta, null); 
-        } catch (Exception e) {
+        } catch (Exception e) { 
             System.err.println("SAGA Aprovar-ms-conta FALHOU (Ativação): " + e.getMessage());
             return; // Para a SAGA
         }               
         System.out.println("Orquestrador enviou para fila de registro de ms-conta: " + evento.getIdCliente());
 
         try{
-            String urlAuth = "http://localhost:8081/auth/criarLogin"; 
+            String urlAuth = msAuthUrl + "/auth/criarLogin"; // Docker
             authCriado = restTemplate.postForObject(urlAuth, evento, AuthDTO.class); 
             System.out.println(authCriado.getSenha());
         } catch (Exception e) {

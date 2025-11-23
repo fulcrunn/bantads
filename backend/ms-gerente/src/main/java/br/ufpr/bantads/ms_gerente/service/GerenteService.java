@@ -23,6 +23,11 @@ public class GerenteService {
 
     @Value("${rabbitmq.cliente.rejeitado.exchange}")
     private String exchangeName;
+
+    @Value("${ms-service.url.ms-cliente}") // Docker
+    private String msClienteUrl;
+    @Value("${ms-service.url.ms-conta}") // Docker
+    private String msContaUrl;
     
     @Value("${rabbitmq.aprovar.exchange}")
     private String clienteAprovadoExchange;
@@ -52,7 +57,7 @@ public class GerenteService {
 
     public List<ClientePendenteDTO> buscarClientesPendentes(Long idGerente){
     // Chama o endpoint filtrado do ms-cliente (lá na porta 8080)
-        String url = "http://localhost:8080/api/clientes/pendentes/gerente/" + idGerente;
+        String url = msClienteUrl + "/api/clientes/pendentes/gerente/" + idGerente; // DOCKER
         
         ClientePendenteDTO[] clientesArray = restTemplate.getForObject(url, ClientePendenteDTO[].class);
         
@@ -119,7 +124,7 @@ public class GerenteService {
         }
 
         // 2. Buscar as contagens do ms-conta (como você já faz)
-        String url = "http://localhost:8084/contas/contagem-por-gerente";
+        String url = msContaUrl + "/contas/contagem-por-gerente";
         GerentePorContaDTO[] gerenteContasArray;
         try{
             gerenteContasArray = restTemplate.getForObject(url, GerentePorContaDTO[].class);

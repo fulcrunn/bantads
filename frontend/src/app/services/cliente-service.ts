@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Cliente } from '../shared/models/cliente.model';
+import { API_GATEWAY_URL } from '../api-config';
 
 const LS_CHAVE = "clientes"
 const LS_CHAVE_TEMP = "clientesPendentes"
@@ -11,8 +12,8 @@ const LS_CHAVE_TEMP = "clientesPendentes"
 export class ClienteService {
   
   // endereço da api de microserviço
-  private readonly API_URL = 'http://localhost:3000/api/clientes';
-  private readonly API_URL_ClientesPendentes = 'http://localhost:3000/api/clientesPendentes';
+  private readonly API_URL = `${API_GATEWAY_URL}/api/clientes`;
+  private readonly API_URL_ClientesPendentes = `${API_GATEWAY_URL}/api/clientesPendentes`;
   cliente: Cliente | null = null;
   constructor(private http: HttpClient) { }
 

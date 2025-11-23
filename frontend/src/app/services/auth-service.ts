@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { LoginResponse } from '../shared/models/loginResponse.model';
 import { Observable, tap } from 'rxjs';
+import { API_GATEWAY_URL } from '../api-config'; // docker
 
 const AUTH_TOKEN_KEY = 'authToken';
 const CURRENT_USER_KEY = 'currentUser';
@@ -11,7 +12,7 @@ const CURRENT_USER_KEY = 'currentUser';
 })
 export class AuthService {
   
-  private readonly API_URL = 'http://localhost:3000/auth';
+  private readonly API_URL = `${API_GATEWAY_URL}/auth`; // docker
   constructor(private http: HttpClient) { }
   loginResponse!: LoginResponse;
   

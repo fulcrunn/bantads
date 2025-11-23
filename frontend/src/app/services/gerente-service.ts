@@ -4,6 +4,7 @@ import { ClienteService } from './cliente-service';
 import { HttpClient } from '@angular/common/http';
 import { ClientePendente } from '../shared/models/cliente-pendente';
 import { Observable } from 'rxjs';
+import { API_GATEWAY_URL } from '../api-config'; // Docker
 
 const LS_CHAVE = "clientes"
 const LS_CHAVE_TEMP = "clientesPendentes"
@@ -12,13 +13,13 @@ const LS_CHAVE_TEMP = "clientesPendentes"
   providedIn: 'root'
 })
 export class GerenteService {
-  private readonly API_URL = 'http://localhost:3000/gerentes'; // URL base
+  private readonly API_URL = `${API_GATEWAY_URL}/gerentes`; // Docker
   clientesPendentes: any[] = [];
   clientesAprovados: Cliente[] = [];
   clientesRecusados: Cliente[] = [];
   mensagem: string = '';
   
-  private readonly API_URL_PENDENTES = 'http://localhost:3000/gerentes/clientes-pendentes';
+  private readonly API_URL_PENDENTES = `${API_GATEWAY_URL}/gerentes/clientes-pendentes`; // Docker
   constructor(private http: HttpClient) { }
   
   calcularLimite(salario: number): number {

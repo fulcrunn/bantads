@@ -16,6 +16,9 @@ import br.ufpr.bantads.ms_notificacao.DTO.ClienteRejeitadoEvent;
 @Component // este bean declara que esta classe é um componente genérico gerenciado pelo Spring
 public class NotificacaoListener {
 
+    @Value("${ms-service.url.ms-cliente}") // docker
+    private String msClienteUrl;
+
     @Autowired // injetar javaMailSender
     private JavaMailSender mailSender;
 
@@ -84,7 +87,7 @@ public class NotificacaoListener {
 
     private String buscarEmailCliente(Long clienteId) {
         System.out.println("BUSCA: Buscando e-mail para cliente ID: " + clienteId);
-        var url = "http://localhost:8080/api/clientes/" + clienteId;
+        var url = msClienteUrl + "/api/clientes/" + clienteId; // docker
         try{
         ClienteDTO cliente = restTemplate.getForObject(url, ClienteDTO.class);
         if (cliente != null && cliente.getEmail() != null) {
