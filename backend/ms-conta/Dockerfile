@@ -16,16 +16,12 @@ RUN chmod +x mvnw
 
 # Baixa dependências e instala...
 RUN ./mvnw dependency:go-offline
-# Baixa dependências e instala (otimiza o cache se o pom.xml não mudar)
-# Usa volume de cache (buildkit) para o repositório Maven
-# Certifique-se de que o seu shell suporta a sintaxe --mount=type=cache (Docker BuildKit)
-RUN --mount=type=cache,target=/root/.m2 ./mvnw dependency:go-offline
 
 # Copia o código fonte da aplicação
 COPY src src
 
-# Constrói o pacote JAR (ignora os testes para acelerar o build)
-RUN --mount=type=cache,target=/root/.m2 ./mvnw package -DskipTests
+# Constrói o pacote JAR (Versão simples, sem BuildKit)
+RUN ./mvnw package -DskipTests
 
 # --------------------------------------------------
 # ESTÁGIO 2: Runtime (Execução)
