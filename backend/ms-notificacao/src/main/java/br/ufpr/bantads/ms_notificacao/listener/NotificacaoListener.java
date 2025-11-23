@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import br.ufpr.bantads.ms_notificacao.DTO.ClienteDTO;
 import br.ufpr.bantads.ms_notificacao.DTO.ClienteRejeitadoEvent;
+import java.util.Map;
 
 
 
@@ -29,6 +30,36 @@ public class NotificacaoListener {
     @Value("${spring.mail.from}") 
     private String remetente;
     
+    @RabbitListener(queues = "${rabbitmq.cliente.aprovado.queue.notificacao}")
+    public void processarClienteAprovado(Map<String, Object> event) { // Usa Map para receber o payload
+        String emailCliente = (String) event.get("email");
+        String senhaGerada = (String) event.get("senhaGerada");
+        Long clienteId = ((Number) event.get("idCliente")).longValue();
+
+        System.out.println("Recebido evento de aprovação para Cliente ID: " + clienteId);
+        
+        if(emailCliente == null || emailCliente.isEmpty() || senhaGerada == null || senhaGerada.isEmpty()){
+            System.err.println("Dados incompletos no evento de aprovação para ID: " + clienteId);
+            return;
+        }
+
+        String assunto = "Sua Conta BANTADS foi Aprovada!🎉";
+        String corpo = String.format("Olá,\n\n" +
+            "Temos o prazer de informar que sua solicitação de cadastro no BANTADS foi **APROVADA**.\n\n" +
+            "Seu acesso já está ativo! Você pode fazer login usando as credenciais abaixo:\n" +
+            "**Login/E-mail:** %s\n" +
+            "**Senha Provisória:** %s\n\n" +
+            "Recomendamos que você altere sua senha após o primeiro acesso.\n\n" +
+            "Atenciosamente,\nEquipe BANTADS",
+            emailCliente, senhaGerada);
+            
+        try {   
+            enviarEmail(emailCliente, assunto, corpo);
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar e-mail de aprovação para o cliente ID: " + clienteId);
+            e.printStackTrace();
+        }
+    }
     
     @RabbitListener(queues = "${rabbitmq.cliente.rejeitado.queue.notificacao}")
     public void processarClienteRejeitado (ClienteRejeitadoEvent event){

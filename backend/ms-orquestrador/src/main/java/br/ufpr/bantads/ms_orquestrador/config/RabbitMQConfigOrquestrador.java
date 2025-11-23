@@ -38,6 +38,9 @@ public class RabbitMQConfigOrquestrador {
     @Value("${rabbitmq.cliente.criado.routingkey}")
     private String clienteCriadoRoutingKey;
 
+    @Value("${rabbitmq.notificacao.aprovado.exchange}")
+    private String notificacaoAprovadoExchange;
+
     @Bean // Define um Bean gerenciado pelo Spring
     public MessageConverter jsonMessageConverter() {
         // Retorna a instância do conversor JSON
@@ -103,4 +106,10 @@ public class RabbitMQConfigOrquestrador {
     public Binding bindingClienteCriado(Queue clienteCriadoQueue, DirectExchange clienteCriadoExchange) {
         return BindingBuilder.bind(clienteCriadoQueue).to(clienteCriadoExchange).with(clienteCriadoRoutingKey);
     }
+
+    // Declaração da Exchange de notificação da aprovação
+    @Bean
+    public DirectExchange notificacaoAprovadoExchange(){
+    return new DirectExchange(notificacaoAprovadoExchange, true, false);
+}
 } //end rabbitmqconfigorquestrador

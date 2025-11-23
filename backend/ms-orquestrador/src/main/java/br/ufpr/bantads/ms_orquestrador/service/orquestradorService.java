@@ -1,5 +1,7 @@
 package br.ufpr.bantads.ms_orquestrador.service;
 
+import java.util.Map;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -55,6 +57,12 @@ public class orquestradorService {
     private String aprovarMsContaRoutingKey;
     @Value("${rabbitmq.msauth.registrar.routingkey}")
     private String aprovarMsAuthRoutingKey;
+
+    // Exchange e key para notificação de aprovação
+    @Value("${rabbitmq.notificacao.aprovado.exchange}")
+    private String notificacaoAprovadoExchange;
+    @Value("${rabbitmq.notificacao.aprovado.routingkey}")
+    private String notificacaoAprovadoRoutingKey;
    
 
     public orquestradorService(RabbitTemplate rabbitTemplate, RestTemplate restTemplate) {
@@ -97,7 +105,7 @@ public class orquestradorService {
         System.out.println("Orquestrador enviou para fila de registro de ms-cliente: " + evento.getIdCliente());
         System.out.println("Status do cliente " + evento.getIdCliente() + " é " + evento.getStatus() );
         
-        // NOVO: Chamada REST para ATIVAR a conta (ms-conta)
+        // Chamada REST para ATIVAR a conta (ms-conta)
        try{
             String urlAtivarConta = msContaUrl + "/contas/ativar/" + evento.getIdCliente(); // Docker        
             // Usa PUT para atualizar o status de INATIVA para ATIVA
@@ -111,13 +119,27 @@ public class orquestradorService {
         try{
             String urlAuth = msAuthUrl + "/auth/criarLogin"; // Docker
             authCriado = restTemplate.postForObject(urlAuth, evento, AuthDTO.class); 
-            System.out.println(authCriado.getSenha());
+            System.out.println("Senha criada no MS-Auth: " + authCriado.getSenha());
         } catch (Exception e) {
             System.err.println("SAGA Aprovar-ms-auth FALHOU: " + e.getMessage());
             return; // Para a SAGA
         }               
             System.out.println("Orquestrador enviou para fila de registro de ms-auth: " + evento.getIdCliente());
-    }
+
+        try {
+            // Usando Map para enviar o payload de forma simples
+            Map<String, Object> notificacaoPayload = Map.of(
+                "email", evento.getEmail(),
+                "senhaGerada", authCriado.getSenha(),
+                "idCliente", evento.getIdCliente() // Lá no DTO Evento ñ tem o nome...
+            );
+            rabbitTemplate.convertAndSend(notificacaoAprovadoExchange, notificacaoAprovadoRoutingKey, notificacaoPayload);
+            System.out.println("Evento de aprovação com senha enviado para ms-notificacao.");
+        } catch (Exception e) {
+            System.err.println("SAGA Notificação de Aprovação FALHOU: " + e.getMessage());
+            // Loga o erro mas a aprovação segue.
+        }    
+    } // aprovarCliente
 
     @RabbitListener(queues = "${rabbitmq.cliente.criado.queue}")
         public void receberEventoClienteCriado(Cliente clienteCriado) {
