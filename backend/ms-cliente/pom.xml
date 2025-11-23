@@ -11,7 +11,7 @@
 	<groupId>br.ufpr.bantads</groupId>
 	<artifactId>ms-cliente</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>ms-cliente</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
+			
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

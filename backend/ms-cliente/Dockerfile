@@ -37,7 +37,7 @@ EXPOSE 8080
 
 # Copia o JAR compilado da fase de build
 # Altere o nome do JAR (ms-cliente-0.0.1-SNAPSHOT.jar) para o nome do seu microsserviço
-COPY --from=build /app/target/ms-cliente-0.0.1-SNAPSHOT.war app.war
+COPY --from=build /app/target/ms-cliente-0.0.1-SNAPSHOT.jar app.jar
 
 # Comando para rodar a aplicação
 ENTRYPOINT ["java","-jar","/app/app.jar"]
