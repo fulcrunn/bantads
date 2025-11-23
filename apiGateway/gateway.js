@@ -9,36 +9,35 @@ const PORT = 3000;
 app.use(morgan('dev'));
 app.use(cors());
 
-// LENDO VARIÁVEIS DE AMBIENTE INJETADAS PELO DOCKER COMPOSE
-// Se a variável não estiver definida (fallback para localhost para testes locais)
-const MS_CLIENTE_TARGET = `http://${process.env.MS_CLIENTE_HOST || 'localhost'}:8080`;
-const MS_AUTH_TARGET = `http://${process.env.MS_AUTH_HOST || 'localhost'}:8081`;
-const MS_GERENTE_TARGET = `http://${process.env.MS_GERENTE_HOST || 'localhost'}:8082`;
+// 1. Configuração dos Hosts (apenas domínio e porta)
+const MS_CLIENTE_HOST = `http://${process.env.MS_CLIENTE_HOST || 'localhost'}:8080`;
+const MS_AUTH_HOST = `http://${process.env.MS_AUTH_HOST || 'localhost'}:8081`;
+const MS_GERENTE_HOST = `http://${process.env.MS_GERENTE_HOST || 'localhost'}:8082`;
 
+// 2. Rotas com Correção de Target (Adicionando o caminho de volta)
 
-// Rota para o microserviço de clientes
+// Rota Clientes
 app.use('/api/clientes', createProxyMiddleware({
-  target: MS_CLIENTE_TARGET, // Usa a variável
+  // Adiciona '/api/clientes' porque o app.use remove e o backend espera receber
+  target: `${MS_CLIENTE_HOST}/api/clientes`, 
   changeOrigin: true,
-  pathRewrite: {
-    '^/api': '', 
-  },
 }));
 
-// Rota para o microserviço de autenticação
+// Rota Auth
 app.use('/auth', createProxyMiddleware({
-  target: MS_AUTH_TARGET, // Usa a variável
+  // Adiciona '/auth' porque o backend espera /auth/login
+  target: `${MS_AUTH_HOST}/auth`, 
   changeOrigin: true,
   logLevel: 'debug',   
 }));
 
-// Rota para o microserviço de gerentes
+// Rota Gerentes
 app.use('/gerentes', createProxyMiddleware({ 
-  target: MS_GERENTE_TARGET, // Usa a variável
+  // Adiciona '/gerentes'
+  target: `${MS_GERENTE_HOST}/gerentes`,
   changeOrigin: true,
 }));
 
-// 🔹 Rota principal (teste)
 app.get('/', (req, res) => {
   res.send('Gateway ativo e roteando requisições!');
 });
