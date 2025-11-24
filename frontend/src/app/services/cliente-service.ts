@@ -2,9 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Cliente } from '../shared/models/cliente.model';
 import { API_GATEWAY_URL } from '../api-config';
+import { Observable } from 'rxjs';
 
 const LS_CHAVE = "clientes"
 const LS_CHAVE_TEMP = "clientesPendentes"
+
+export interface ContaMinDTO {
+  saldo: number;
+  limite: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +19,7 @@ export class ClienteService {
   
   // endereço da api de microserviço
   private readonly API_URL = `${API_GATEWAY_URL}/api/clientes`;
+  private readonly API_URL_CONTAS = `${API_GATEWAY_URL}/contas`;
   private readonly API_URL_ClientesPendentes = `${API_GATEWAY_URL}/api/clientesPendentes`;
   cliente: Cliente | null = null;
   constructor(private http: HttpClient) { }
@@ -47,10 +54,8 @@ export class ClienteService {
     return this.http.post<Cliente>(this.API_URL, cliente);
   }
   
-  getSaldo(cliente: Cliente): number {
-    const clientes = this.listarClientesLocalStorage(LS_CHAVE);
-    const clienteEncontrado = clientes.find(c => c.cpf === cliente.cpf);
-    return clienteEncontrado ? clienteEncontrado.saldo : 0;
+  getSaldoLimiteByClienteId(idCliente: string): Observable<ContaMinDTO> {
+    return this.http.get<ContaMinDTO>(`${this.API_URL_CONTAS}/cliente/${idCliente}`);
   }
 
   depositar(cliente: Cliente, valor: number): void {

@@ -22,9 +22,15 @@
     <div class="col-md-6">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h5 class="card-title">Saldo Atual</h5>
-          <p class="h4" [class.text-success]="saldo >= 0" [class.text-danger]="saldo < 0">
-            {{ saldo | currency:'BRL':'symbol':'1.2-2' }}
+          <h5 class="card-title">Saldo Disponível (Conta + Limite)</h5>
+          <p class="h4" [class.text-success]="saldoTotalDisponivel >= 0" [class.text-danger]="saldoTotalDisponivel < 0">
+            {{ saldoTotalDisponivel | currency:'BRL':'symbol':'1.2-2' }}
+          </p>
+          <p class="card-text">
+            Saldo em Conta: **{{ saldoConta | currency:'BRL':'symbol':'1.2-2' }}**
+          </p>
+          <p class="card-text">
+            Limite: **{{ limiteDisponivel | currency:'BRL':'symbol':'1.2-2' }}**
           </p>
         </div>
       </div>
