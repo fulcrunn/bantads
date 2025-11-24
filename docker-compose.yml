@@ -151,12 +151,14 @@ services:
       - MS_CLIENTE_HOST=ms-cliente 
       - MS_AUTH_HOST=ms-auth
       - MS_GERENTE_HOST=ms-gerente
+      - MS_CONTA_HOST=ms-conta
     ports:
       - "3000:3000"
     depends_on:
       - ms-cliente
       - ms-auth
       - ms-gerente
+      - ms-conta
 
   # --------------------------------------------------
   # FRONTEND (ANGULAR / NGINX)

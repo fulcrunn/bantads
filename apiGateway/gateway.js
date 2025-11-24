@@ -38,9 +38,9 @@ app.use('/gerentes', createProxyMiddleware({
 }));
 
 app.use('/contas', createProxyMiddleware({ 
-  // Acesso a ms-conta
-  target: `${MS_CONTA_HOST}/contas`,
-  changeOrigin: true,
+// Acesso a ms-conta
+  target: `${MS_CONTA_HOST}/contas`,
+  changeOrigin: true,
 }));
 
 app.get('/', (req, res) => {
