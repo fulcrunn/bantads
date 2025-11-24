@@ -91,4 +91,8 @@ public class contaService {
     public List<GerentePorContaDTO> getGerentePorConta() {
         return contaRepository.countContasByGerente();
     }
+
+    public Conta getContaByClienteId(Long idCliente) {
+    return contaRepository.findByIdCliente(idCliente);
+}
 }

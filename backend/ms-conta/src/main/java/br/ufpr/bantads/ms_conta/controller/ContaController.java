@@ -38,5 +38,23 @@ public class ContaController {
         contaService.ativarConta(idCliente);
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/cliente/{idCliente}")
+    public ResponseEntity<ContaDTO> getContaByClienteId(@PathVariable Long idCliente) {
+        Conta conta = contaService.getContaByClienteId(idCliente);
+        if (conta != null) {
+            ContaDTO dto = new ContaDTO(); 
+            dto.setSaldo(conta.getSaldo());
+            dto.setLimite(conta.getLimite());
+            dto.setIdCliente(conta.getIdCliente());
+            dto.setNumConta(conta.getNumConta());
+            
+            return ResponseEntity.ok(dto);
+        } else {
+            // Erro de Conta não encontrada
+            System.out.println("ERRO - Conta não encontrada! (Vide ms-conta, ContaController.java)"); 
+            return ResponseEntity.notFound().build(); 
+        }
+    }
     
 }//

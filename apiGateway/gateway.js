@@ -9,12 +9,11 @@ const PORT = 3000;
 app.use(morgan('dev'));
 app.use(cors());
 
-// 1. Configuração dos Hosts (apenas domínio e porta)
+// Configuração dos Hosts (apenas domínio e porta)
 const MS_CLIENTE_HOST = `http://${process.env.MS_CLIENTE_HOST || 'localhost'}:8080`;
 const MS_AUTH_HOST = `http://${process.env.MS_AUTH_HOST || 'localhost'}:8081`;
 const MS_GERENTE_HOST = `http://${process.env.MS_GERENTE_HOST || 'localhost'}:8082`;
-
-// 2. Rotas com Correção de Target (Adicionando o caminho de volta)
+const MS_CONTA_HOST = `http://${process.env.MS_CONTA_HOST || 'localhost'}:8084`;
 
 // Rota Clientes
 app.use('/api/clientes', createProxyMiddleware({
@@ -38,10 +37,17 @@ app.use('/gerentes', createProxyMiddleware({
   changeOrigin: true,
 }));
 
+app.use('/contas', createProxyMiddleware({ 
+  // Acesso a ms-conta
+  target: `${MS_CONTA_HOST}/contas`,
+  changeOrigin: true,
+}));
+
 app.get('/', (req, res) => {
   res.send('Gateway ativo e roteando requisições!');
 });
 
 app.listen(PORT, () => {
   console.log(`🚀 API Gateway rodando em http://localhost:${PORT}`);
+
 });
